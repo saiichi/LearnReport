@@ -1,0 +1,1381 @@
+\documentclass[slidestop,compress,mathserif]{beamer}
+\usepackage{setspace}
+\usepackage{ragged2e}
+\let\raggedright=\RaggedRight
+%\usepackage[bars]{beamerthemetree} % Beamer theme v 2.2
+\usetheme{Antibes} % Beamer theme v 3.0
+\usecolortheme{lily} % Beamer color theme
+\title{Report}
+\author{Cuiyi}
+\institute{}
+
+\begin{document}
+% coverpage
+\begin{frame} % Cover slide
+\titlepage
+\end{frame}
+%section 1 Supervised Learning
+\section{Supervised Learning}
+%section 1.1 Discriminate Method
+    \subsection{Review}
+    %review slide
+    \begin{frame}[options]
+        \frametitle{Discriminate Method Review}
+
+        %\begin{enumerate}
+%        \item ...
+%        \end{enumerate}
+        %\begin{block}<+->{Review}
+        \begin{enumerate}
+            \item Logistic Regression
+
+                Assume $y=0$ or $y=1$,and $h_w(x)=\frac{1}{1-e^{w^Tx}}$
+            \item Perceptron Learning Algorithm
+
+                $h_w(x)$ is a threshold function:
+
+                $$h_w(x) = g_w(w^Tx)=\left\{
+                    \begin{array}{ll}
+                        1  &\mbox{if $w^Tx \ge 0$}\\
+                        -1  &\mbox{otherwise}
+                    \end{array}
+                    \right.
+                $$
+        \end{enumerate}
+        %\end{block}
+
+        %\begin{figure}
+%            \pgfimage[width=5cm ]{"123.jpg"}
+%        \end{figure}
+    %\subsection{Gradient descent}
+    \end{frame}
+    %review slide
+    \begin{frame}
+        \frametitle{Gradient descent Review}
+        Batch Gradient descent
+
+            Repeat for each parameter :
+            $$w_i := w_i + \alpha \frac{\partial}{\partial w_i}Loss(h_w(x),y)$$
+        \begin{figure}
+           \pgfimage[width=5cm ]{"image/01.png"}
+        \end{figure}
+
+
+
+    \end{frame}
+    \begin{frame}
+        \frametitle{Gradient descent Review(2)}
+        \fontsize{8pt}{7.2}\selectfont
+        The normal equations:
+
+        For a function $f:\mathbb{R}^{m\times n}\to \mathbb{R}$ define the derivative of $f$ with respect to $A$ to be:
+
+        $$\nabla_Af(A)=\left(
+                         \begin{array}{ccc}
+                           \frac{\partial}{\partial A_{11}} & \ldots & \frac{\partial}{\partial A_{1n}} \\
+                           \vdots & \ddots & \vdots \\
+                           \frac{\partial}{\partial A_{m1}} & \ldots & \frac{\partial}{\partial A_{mn}} \\
+                         \end{array}
+                       \right)
+        $$
+        For examples, suppose $A=\left(
+                                   \begin{array}{cc}
+                                     A_{11} & A_{12} \\
+                                     A_{21} & A_{22} \\
+                                   \end{array}
+                                 \right)
+        $ is a 2-by-2 matrix,and:
+        $$f(A)= \frac{3}{2}A_{11}+5A_{12}^2+A_{21}A_{22}$$
+        Then we have:
+        $$\nabla_Af(A)=\left(
+                         \begin{array}{cc}
+                           \frac{3}{2} & 10A_{12} \\
+                           A_{22} & A_{21} \\
+                         \end{array}
+                       \right)
+        $$
+        Define of \textbf{trace} operator. For an n-by-n matrix A:
+        $$trA=\sum_{i=1}^n A_{ii}$$
+    \end{frame}
+    \begin{frame}
+        \frametitle{Gradient descent Review(3)}
+        For two matrices $A$ and $B$,such that $ABC$ is square,we have:
+        $$trAB=trBA$$
+        As corollaries:
+        $$trABC=trCAB=trBCA$$
+        Here $A$ and $B$ is square matrices and a is real number:
+        \begin{eqnarray*}
+            trA &=& trA^T\\
+            tr(A+B)&=& trA+trB\\
+            traA &=& atrA
+        \end{eqnarray*}
+
+    \end{frame}
+    \begin{frame}
+        \frametitle{Gradient descent Review(4)}
+        Some facts without proof:
+        \begin{eqnarray*}
+            \nabla_AtrAB &=& B^T\\
+            \nabla_{A^T}f(A) &=& (\nabla_Af(A))^T\\
+            \nabla_AtrABA^TC &=& CAB+ C^TAB^T\\
+        \end{eqnarray*}
+        Revisit Least Squares:
+
+        define \textbf{design matrix}$X$ to be the m-by-n matrix:
+        $$X=\left(
+              \begin{array}{ccc}
+                x_1^{(1)} & \ldots & x_n^{(1)} \\
+                \vdots & \ddots & \vdots \\
+                x_1^{(m)} & \ldots & x_n^{(m)} \\
+              \end{array}
+            \right)
+        $$
+    \end{frame}
+    \begin{frame}
+        \frametitle{Gradient descent Review(5)}
+        define $\vec{y}$ be m-dimensional vector:
+        $$\vec{y}=\left(
+                               \begin{array}{c}
+                                 y^{(1)} \\
+                                 y^{(2)} \\
+                                 \vdots \\
+                                 y^{(m)} \\
+                               \end{array}
+                             \right)
+        $$
+        Since $h_w(x^{(i)})=(x^{(i)})^Tw$:
+        \begin{eqnarray*}
+            Xw-\vec{y} &=& \left(
+                         \begin{array}{c}
+                           (x^{(1)})^Tw \\
+                           \vdots \\
+                           (x^{(m)})^Tw \\
+                         \end{array}
+                       \right)
+                       -
+                       \left(
+                         \begin{array}{c}
+                           y^{(1)} \\
+                           \vdots \\
+                           y^{(m)} \\
+                         \end{array}
+                       \right)\\
+                       &=& \left(
+                             \begin{array}{c}
+                               h_w(x^{(1)})-y^{(1)} \\
+                               \vdots \\
+                               h_w(x^{(m)})-y^{(m)} \\
+                             \end{array}
+                           \right)
+        \end{eqnarray*}
+
+    \end{frame}
+    \begin{frame}[options]
+        \frametitle{Gradient descent Review(5)}
+        %\fontsize{8pt}{7.2}\selectfont
+        Using the face that for $\vec{z}$,we have $\vec{z}^T\vec{z}=\Sigma_i\vec{z}_i^2$:
+        \begin{eqnarray*}
+            \frac{1}{2}(Xw-\vec{y})^T(Xw-\vec{y}) &=& \frac{1}{2}\sum_{i=1}^m(h_w(x^{(i)})-y^{(i)})^2\\
+            &=& J(w)
+        \end{eqnarray*}
+        \begin{eqnarray*}
+            \nabla_wJ(w) &=& \nabla_w \frac{1}{2}(Xw-\vec{y})^T(Xw-\vec{y})\\
+            &=& \frac{1}{2}\nabla_wtr(w^TX^TXw-w^TX^T\vec{y}-\vec{y}^TXw+\vec{y}^T\vec{y})\\
+            &=& \frac{1}{2}\nabla_w(trw^TX^TXw-2tr\vec{y}^TXw)\\
+            &=& \frac{1}{2}(X^TXw+X^TXw-2X^Tw)\\
+            &=& X^TXw-X^T\vec{y}
+        \end{eqnarray*}
+    \end{frame}
+    \subsection{Generative Learning algorithms}
+    \begin{frame}[shrink]
+        %\fontsize{12pt}{7.2}\selectfont
+        \frametitle{What are Generative Learning algorithms}
+        \begin{itemize}
+          \item Consider a classification problem: distinguish between benign tumors and malignant tumors.
+          \item Given a training set, an algorithm like logistic regression or
+              the perceptron algorithm (basically) tries to find a straight line that is, a decision boundary—that separates the benign tumor and malignant tumor.
+			  Algorithms that try to learn $P(y|x)$ directly are called \textbf{discriminative learning algorithms}.
+          \item Different approach: Fist we can build a model of what benign tumors look like. Then we build a seperate model of what malignant tumors look like. Finally, to classify a new sample,we can match the new sample with each model,to see whether one model matches better than one other model.
+
+              Algorithms that try to learn $P(x|y)$(and $P(y)$) are called \textbf{generative learning algorithms}.
+              
+        \end{itemize}
+        $$$$
+    \end{frame}
+    \begin{frame}
+        \frametitle{The multivariate normal distribution}
+        Suppose these is a multivariate normal distribution is parameterized by a \textbf{mean vector} $\mu \in \mathbb{R}^n$ and a \textbf{covariance matrix} $\Sigma \in \mathbb{R}^{n\times n}$,its density is given by:
+        $$p(x;\mu,\Sigma)=\frac{1}{(2\pi)^{n/2}|\Sigma|^{1/2}}\exp\bigg(-\frac{1}{2}(x-\mu)^T\Sigma^{-1}(x-\mu)\bigg)$$
+        \begin{figure}
+           \pgfimage[height=3cm ]{"image/02.png"}
+        \end{figure}
+    \end{frame}
+    \begin{frame}
+        \frametitle{The multivariate normal distribution(2)}
+        \begin{figure}
+           \pgfimage[height=3.3cm ]{"image/03.png"}
+        \end{figure}
+        \begin{figure}
+           \pgfimage[height=3cm ]{"image/04.png"}
+        \end{figure}
+    \end{frame}
+    \begin{frame}[shrink]
+        \frametitle{The Gaussian Discriminant Analysis model(1)}
+        GDA Model is:
+        \begin{eqnarray*}
+            y &\sim& Bernoulli(\phi)\\
+            x|y=0 &\sim& \mathcal{N}(\mu_0,\Sigma)\\
+            x|y=1 &\sim& \mathcal{N}(\mu_1,\Sigma)
+        \end{eqnarray*}
+        Writing out the distribution:
+        $$p(y)=\phi^y(1-\phi)^y$$
+        $$p(x|y=0) = \frac{1}{(2\pi)^{n/2}|\Sigma|^{1/2}}\exp\bigg( -\frac{1}{2}(x-\mu_0)^T\Sigma^{-1}(x-\mu_0)\bigg)$$
+        $$p(x|y=1) = \frac{1}{(2\pi)^{n/2}|\Sigma|^{1/2}}\exp\bigg( -\frac{1}{2}(x-\mu_1)^T\Sigma^{-1}(x-\mu_1)\bigg)$$
+
+    \end{frame}
+    \begin{frame}[shrink]
+        \frametitle{The Gaussian Discriminant Analysis model(2)}
+        The log-likelihood is:
+        \begin{eqnarray*}
+            \l(\phi,\mu_0,\mu_1,\Sigma) &=& \log\prod_{i=1}^mp(x^{(i)},y^{(i)};\phi,\mu_0,\mu_1,\Sigma)\\
+            &=& \log \prod_{i=1}^mp(x^{(i)}|y^{(i)};\mu_0,\mu_1,\Sigma)p(y^{(i)};\phi)
+        \end{eqnarray*}
+        By maximizing $l$ with respect to the parameters,we find the maximum likelihood estimate of parameters to be:
+        \begin{eqnarray*}
+            \phi &=& \frac{1}{m}\sum_{i:y^{(i)}=1}^my^{(i)}\\
+            \mu_0 &=& \frac{\sum_{i:y^{(i)}=0}^mx^{(i)}}{\sum_{i:y^{(i)}=0}^my^{(i)}}\\
+            \mu_1 &=&
+            \frac{\sum_{i:y^{(i)}=1}^mx^{(i)}}{\sum_{i:y^{(i)}=1}^my^{(i)}}\\
+            \Sigma &=& \frac{1}{m}\sum_{i=1}^m(x^{(i)}-\mu_{y^{(i)}})(x^{(i)}-\mu_{y^{(i)}})^T
+        \end{eqnarray*}
+    \end{frame}
+    \begin{frame}[shrink]
+        \frametitle{The Gaussian Discriminant Analysis model(3)}
+        Pictorially, what the algorithm is doing can be seen in as follows:
+        \begin{figure}
+           \pgfimage[height=6cm ]{"image/05.png"}
+        \end{figure}
+    \end{frame}
+    \begin{frame}[shrink]
+        \frametitle{Discussion: GDA and logistic regression}
+        If we view $p(y=1|x;\phi,\mu_0,\mu_1,\Sigma)$ as a function of $x$, there is a fact that:
+        $$p(y=1|x;\phi,\Sigma,\mu_0,\mu_1)=\frac{1}{1+\exp(-w^Tx)}$$
+        This is exactly the form that logistic regression used to model $p(y=1|x)$.
+
+        In fact in binary division problem:
+            $$p(x|y=1)\sim ExpFamily(x,\eta)\Rightarrow p(y=1|x)=Sigmoid $$
+
+        When would we prefer one model over another?
+
+        \begin{itemize}
+          \item GDA makes stronger modelling assumptions, and is more data efficient (i.e., requires less training data to learn “well”) when the modeling assumptions are correct or at least approximately correct.
+          \item Logistic regression makes weaker assumptions, and is significantly more robust to deviations from modeling assumptions.
+        \end{itemize}
+
+    \end{frame}
+    \subsection{Bayesian Decision Theory}
+    \begin{frame}
+    	\frametitle{Bayes' formula}
+    	Suppose that we have the prior probability $P(\omega_j)$
+    	and the conditional densities $p(x|\omega_j)$, the posterior
+    	probability can be written as:
+    	$$P(\omega_j|x)=\frac{p(x|\omega_j)P(\omega_j)}{p(x)},$$ 
+    	where
+    	$$p(x)=\sum_{j=1}^cp(x|\omega_j)P(\omega_j).$$
+    	Bayes' formula can be expressed informally in English:
+    	$$posterior = \frac{likelihood\times prior}{evidence}.$$
+    \end{frame}
+    \begin{frame}
+    	\frametitle{Bayesian Decision Theory – Continuous Features}
+    	Let $\omega_1,\ldots,\omega_c$ be the finite set of $c$ states of
+    	nature ("categories") and $\alpha_1,\ldots,\alpha_a$ be the
+    	finite set of a possible action. The Loss function $\lambda
+    	(\alpha_i|\omega_j)$ describe the loss incurred for taking
+    	action $\alpha_i$ when the state of nature is $\omega_j$. The
+    	posterior probability $P(\omega_j|x)$ can be compute from 
+    	$P(\omega_j|x)$ by Bayes'formula:
+    	$$P(\omega_j|x)=\frac{p(x|\omega_j)P(\omega_j)}{p(x)}$$
+    	where the evidence is now
+    	$$p(x)=\sum_{j=1}^cp(x|\omega_j)P(\omega_j)$$
+    	
+    \end{frame}
+    \begin{frame}
+    	\frametitle{Bayesian Decision Theory – Continuous Features(2)}
+    	Suppose that we observe a particular $x$ and that we 
+    	contemplate taking action $\alpha_i$.
+    	$$R(\alpha_i|x)=\sum_{j=1}^c\lambda(\alpha_i|\omega_j)
+    	P(\omega_j|x)$$
+    	In decision-theoretic terminology, an expected loss is called a risk,
+    	and $R(\alpha_i|x)$ is called the \textbf{conditional risk}.
+    	If we define loss function to be
+    	$$\lambda(\alpha_i|\omega_j)=\left\{\begin{array}{ll}
+    	0 & i=j\\
+    	1 & i\neq j
+    	\end{array}\right. i,j=1,\ldots,c.$$
+    	Condition risk will be
+    	$$R(\alpha_i|x) = \sum_{j=1}^c\lambda(\alpha_i|\omega_j)P(\omega_j|x)=1-P(\omega_i|x)$$	
+    \end{frame}
+    \begin{frame}
+    	\frametitle{Classifiers, Discriminant Functions and Decision
+    		Surfaces}
+    	For 0-1 Loss function case, we can simplely let the discriminant functions to be $g_i(x)=P(\omega_i|x)$. More generally, if we replace every $g_i(x)$ by $f(g_i(x))$, where $f(\cdot)$ is a monotonically increasing fuction, the resulting classification is unchanged.
+    	$$g_i(x)=P(\omega_i|x)=\frac{p(x|\omega_i)P(\omega_i)}{\sum_{j=1}^cp(x|\omega_j)P(\omega_j)}
+    	$$
+    	$$g_i(x) = p(x|\omega_i)P(\omega_i)$$
+    	$$g_i(x) = \log p(x|\omega_i)+\log P(\omega_i)$$
+    \end{frame}
+    \begin{frame}[shrink]
+    	\frametitle{Discriminant Functions for the Normal Density}
+    	if $p(x|\omega_i) \sim \mathcal{N}(\mu_i,\Sigma_i)$,
+    	$$g_i(x)=-\frac{1}{2}(x-\mu_i)^T\Sigma_i^{-1}(x-\mu_i)-\frac{d}{2}\log 2\pi - \frac{1}{2}\log |\Sigma_i|+\log P(\omega_i)$$
+    	Case: $\Sigma_i = \sigma^2I$
+    	
+    	Ignore terms which are independent of i, we obtain:
+    	\begin{eqnarray*}
+    		g_i(x) &=& -\frac{\|x-\mu_i\|^2}{2\sigma^2}+\log P(\omega_i)\\
+    		&=& -\frac{1}{2\sigma^2}(x^Tx-2\mu_i^Tx+\mu_i^T\mu_i)+\log P(\omega_i)
+    	\end{eqnarray*}
+    	Since $x^Tx$ is the same for all $i$'s, we obtain
+    	$$g_i(x) = w_i^Tx+w_{i0}$$
+    	where
+    	$$w_i=\frac{1}{\sigma^2}\mu_i,\quad w_{i0} = -\frac{1}{2\sigma^2}\mu_i^T\mu_i+\log P(\omega_i)$$
+    \end{frame}
+    \begin{frame}
+    	\frametitle{Discriminant Functions for the Normal Density(2)}
+    	For two class, we can set $g_i(x)=g_j(x)$:
+    	$$w^T(x-x_0)=0,$$
+    	where,
+    	$$w = \mu_i-\mu_j$$
+    	and,
+    	$$x_0=\frac{1}{2}(\mu_i+\mu_j)-\frac{\sigma^2}{\|\mu_i-\mu_j\|}\log\frac{P(\omega_i)}{P(\omega_j)}(\mu_i-\mu_j)$$
+    \end{frame}
+    \begin{frame}
+    	\frametitle{Discriminant Functions for the Normal Density(3)}
+    	Case $\Sigma_i=\Sigma$:
+    	$$g_i(x) = w^Tx + w_0$$
+    	where
+    	$$w_i=\Sigma^{-1}\mu_i,\quad w_{i0}=-\frac{1}{2}\mu_i^T\Sigma^{-1}\mu_i+\log P(\omega_i)$$
+    	Case $\Sigma_i=?$
+    	$$g_i=x^TW_ix+w_i^Tx+w_{i0}$$
+    	where,
+    	$$W_i=-\frac{1}{2}\Sigma_i^{-1},\quad w_i=\Sigma_i^{-1}\mu_i$$
+    	and,
+    	$$w_{i0}=-\frac{1}{2}\mu_i^T\Sigma_i^{-1}\mu_i-\frac{1}{2}\log |\Sigma_i| + \log P(\omega_i)$$
+    \end{frame}
+    \begin{frame}
+    	\frametitle{Bayesian estimation}
+    	In Bayesian estimation, we consider parameter $\theta$ to be a random variable. Any information we might have about $\theta$ prior to observing the samples is assumed to be contained in a \textit{known} prior density $p(\theta)$. Observation of the samples converts this to a posterior density $p(\theta|\mathcal{D})$
+    	
+    	Knowing that our goal is to  compute $p(x|\mathcal{D})$, we do this by:
+    	$$p(x|\mathcal{D})=\int p(x,\theta|\mathcal{D})d\theta$$ 
+    	then:
+    	$$p(x|\mathcal{D}) = \int p(x|\theta)p(\theta|\mathcal{D})d\theta$$
+    \end{frame}
+    \begin{frame}
+    	\frametitle{Bayesian estimation(2)}
+    	Suppose $\mu$ is the only unknown parameter, and
+    	$$p(x|\mu)\sim \mathcal{N}(\mu,\sigma^2).$$
+    	Our prior knowledge we might have about $\mu$ can be expressed by a known prior density $p(\mu)$.
+    	$$p(\mu)\sim \mathcal{N}(\mu_0,\sigma_0^2)$$
+    	To obtain the posterior probability:
+    	\begin{eqnarray*}
+    		p(\mu|\mathcal{D}) &=& \frac{p(\mathcal{D}|\mu)p(\mu)}{\int p(\mathcal{D|\mu})p(\mu)}\\
+    		&=&\alpha\prod_{k=1}^np(x_k|\mu)p(\mu)
+    	\end{eqnarray*}
+    \end{frame}
+    \begin{frame}[shrink]
+    	\frametitle{Bayesian estimation(3)}
+    	Since $p(x_k|\mu)\sim\mathcal{N}(\mu,\sigma^2)$ and $p(\mu)\sim\mathcal{N}(\mu_0,\sigma_0^2)$:
+    	\begin{figure}
+    		\pgfimage[width=9cm]{"image/17.png"}
+    	\end{figure}
+    	Now we know $p(\mu|\mathcal{D})$ is a Gaussian distribution, If we write $p(\mu|\mathcal{D}\sim\mathcal{N}(\mu_n\sigma_n^2))$,we obtain:
+    	$$\mu_n=\left(\frac{n\sigma_0^2}{n\sigma_0^2+\sigma^2}\right)\bar{x_n}+\frac{\sigma^2}{n\sigma_0^2+\sigma^2}\mu_0$$
+    	$$\sigma_n^2=\frac{\sigma_0^2\sigma^2}{n\sigma_0^2+\sigma^2}$$
+    	
+    \end{frame}
+    \begin{frame}
+    	Now we need to compute the $p(x|\mathcal{D})$:
+    	\begin{figure}
+    		\pgfimage[width=10cm]{"image/18.png"}
+    	\end{figure}
+    	Hence,
+    	$$p(x|\mathcal{D})\sim\mathcal{N}(\mu_n,\sigma^2+\sigma_n^2)$$
+    \end{frame}
+    \subsection{Support Vector Machines}
+    \begin{frame}[shrink]
+        \frametitle{Margin(1)}
+        Previous:
+
+        Consider logistic regression,we compute $w^Tx$ then we:
+        \begin{itemize}
+          \item Predict "1" iff $w^Tx\ge 0$.
+          \item Predict "0" iff $w^Tx<0$.
+        \end{itemize}
+        The larger $w^Tx$ is,the larger also is $h_w(x)=p(y|x;w)$:
+        \begin{itemize}
+          \item if $w^Tx \gg 0$ then we are very "confident" predicting "1".
+          \item if $w^Tx \ll 0$ then we are very "confident" predicting "0".
+        \end{itemize}
+        \begin{figure}
+           \pgfimage[width=6cm,height=3cm]{"image/06.png"}
+        \end{figure}
+
+
+
+    \end{frame}
+    \begin{frame}[shrink]
+        \frametitle{Margin(2)}
+        To make our discussion of SVMs easier,we need to change our notation:
+
+        we use $y \in {1,-1}$ to denote class label, and change classifier as:
+        $$h_{w,b}(x)=g(w^Tx+b)$$
+        Here $g$ is a threshold function.
+
+        Given a training example $(x^{(i)},y^{(i)})$,we define \textbf{functional margin} of $(w,b)$ with respect to the training example.
+        $$ \hat{\gamma}^{(i)}=y^{(i)}(w^Tx^{(i)}+b) $$
+        A large functional margin represents a confident and a correct prediction.But by exploiting our freedom to scale w and b, we can make the functional margin arbitrarily large without really changing anything meaningful.
+
+        Given a training set $S$,we also define the function margin of $(w, b)$ with respect to $S$:
+
+        $$\hat{\gamma}= \min_{i=1,\ldots,m}\hat{\gamma}^{(i)}$$
+
+    \end{frame}
+    \begin{frame}[shrink]
+        \frametitle{Margin(3)}
+        Let’s talk about \textbf{geometric margins}. Consider the picture below:
+        \begin{figure}
+           \pgfimage[width=5cm,height=3cm]{"image/07.png"}
+        \end{figure}
+        Suppose A is $x^{(i)}$,then B is $x^{(i)}-\gamma^{(i)}\cdot (w/\|w\|)$,B lies on the decision boundary,Hence:
+        $$w^T\bigg(x^{(i)}-\gamma^{(i)}\cdot\frac{w}{\|w\|}\bigg)+b=0$$
+        Solving for $\gamma^{(i)}$ yields:
+        $$\gamma^{(i)}=\bigg(\frac{w}{\|w\|}\bigg)^Tx^{(i)}+\frac{b}{\|w\|}$$
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{Margin(4)}
+        More generally,define geometric margins of $(w,b)$ with respect to a training example $(x^{(i)},y^{(i)})$ to be
+        $$\gamma^{(i)}=y^{(i)}\left(\bigg(\frac{w}{\|w\|}\bigg)^Tx^{(i)}+\frac{b}{\|w\|}\right)$$
+        Given a training set $S$, we also define the geometric margin of $(w, b)$ with respect to S to be the smallest of the geometric margins on the individual training examples:
+        $$\gamma=\min_{i=1,\ldots,m}\gamma^{(i)}$$
+    \end{frame}
+
+    \begin{frame}[shrink]
+        \frametitle{The optimal margin classifier}
+        Given a training set,We try to find a decision boundary that maximizes the margin. We can pose the following optimization problem
+        \begin{eqnarray*}
+            \max_{\gamma,w,b} && \gamma\\
+            s.t. && y^{(i)}(w^Tx^{(i)}+b)\ge \gamma,i=1,\ldots,m\\
+            && \|w\|=1.
+        \end{eqnarray*}
+        The "$\|w\|$" constraint is a nasty(non-convex) constraint.
+        Transform to a nicer one:
+        \begin{eqnarray*}
+            \max_{\gamma,w,b} && \frac{\hat{\gamma}}{\|w\|}\\
+            s.t. && y^{(i)}(w^Tx^{(i)}+b)\ge \hat{\gamma},i=1,\ldots,m
+        \end{eqnarray*}
+        We get rid of "$\|w\|=1$" which we don't like. But the downside is that we now have a nasty(non-convex) objective function.
+        $$$$
+    \end{frame}
+
+    \begin{frame}[shrink]
+        \frametitle{The optimal margin classifier(2)}
+        Since we can add an arbitrary scaling constraint on w and b without changing anything.We introduce a scaling constraint:
+        $$\hat{\gamma}=1$$
+        Plugging this into our problem above,and noting that maximizing $\hat{\gamma}/\|w\|=1/\|w\|$ is the same thing as minimizing$\|w\|^2$, we now have the following optimization problem:
+        \begin{eqnarray*}
+            \min_{\gamma,w,b} && \frac{1}{2}\|w\|^2\\
+            s.t. && y^{(i)}(w^Tx^{(i)}+b)\ge 1,i=1,\ldots,m
+        \end{eqnarray*}
+        Now,we have an optimization problem with a convex quadratic objective and only linear constraints.This optimization problem can be solved using commercial quadratic programming (QP) code.
+        $$$$
+    \end{frame}
+    \begin{frame}[shrink]
+        \frametitle{Lagrange duality}
+        Consider problem of the following form:
+        \begin{eqnarray*}
+            \min_w && f(w)\\
+            s.t. && h_i(w)=0,i=1,\ldots,l.
+        \end{eqnarray*}
+        Define \textbf{Lagrangian} to be
+        $$\mathcal{L}(w,\beta)=f(w)+\sum_{i=1}^l\beta_ih_i(w)$$
+        Here,the $\beta_i$'s are called the \textbf{Lagrange multipliers}. Set $\mathcal{L}$'s partial derivatives to zero:
+        $$\frac{\partial\mathcal{L}}{\partial w_i}=0;\frac{\partial\mathcal{L}}{\partial \beta_i}=0$$
+        We can solve for $w$ and $\beta$
+        $$$$
+    \end{frame}
+    \begin{frame}[shrink]
+        \frametitle{Lagrange duality(2)}
+        Consider the following, which we call the \textbf{primal} optimization problem:
+        \begin{eqnarray*}
+            \min_w && f(w)\\
+            s.t. && g_i(w) \le 0,i=1,\ldots,k\\
+            && h_i(w)=0,i=1,\ldots,l
+        \end{eqnarray*}
+        Define \textbf{generalized Lagrangian}
+        $$\mathcal{L}(w,\alpha,\beta)=f(w)+\sum_{i=1}^k\alpha_ig_i(w)+\sum_{i=1}^l\beta_ih_i(w).$$
+        Here the $\alpha_i$'s and $\beta_i$'s are the Lagrange multipliers.Consider the quantity:
+        $$\theta_\mathcal{P}=\max_{\alpha,\beta:\alpha_i\ge 0}f(w)+\sum_{i=1}^k\alpha_ig_i(w)+\sum_{i=1}^l\beta_ih_i(w)$$
+        Here,the "$\mathcal{P}$" subscript stands for "primal".
+        $$$$
+    \end{frame}
+    \begin{frame}
+        \frametitle{Lagrange duality(3)}
+        Let some $w$ be given. If $w$ violates any of the primal constraints,then it's easy to verify that $\theta_\mathcal{P}=\infty$. Conversely, if the constraints are indeed satisfied for a particular value of w,then $\theta_\mathcal{P}=f (w)$.Hence,
+        $$\theta_\mathcal{P}(w)=\left\{\begin{array}{ll}
+                        f(w)  & \mbox{if $w$ satisfied primal conatraints}\\
+                        \infty  &\mbox{otherwise}
+                        \end{array}
+                        \right.
+        $$
+        If we consider the minimization problem
+        $$\min_w\theta_\mathcal{P}(w)=\min_w\max_{\alpha,\beta,\alpha_i\ge 0} \mathcal{L}(w,\alpha,\beta)$$
+        It is the same problem of primal problem.Define optimal value of the objective to be $p^*=\min_w\theta_\mathcal{P}(w)$
+    \end{frame}
+    \begin{frame}
+        \frametitle{Lagrange duality(4)}
+        Define:
+        $$\theta_\mathcal{D}(\alpha,\beta)=\min_w\mathcal{L}(w,\alpha,\beta).$$
+        Here,the "$\mathcal{D}$" subscript stands for "dual".
+
+        Now the \textbf{dual} optimization problem:
+        $$\max_{\alpha,\beta:\alpha_i \ge 0}\theta_\mathcal{D}(\alpha,\beta)=\max_{\alpha,\beta:\alpha_i \ge 0}\min_w\mathcal{L}(w,\alpha,\beta)$$
+        define the optimal value of the dual problems objective to be $d^*=\max_{\alpha,\beta:\alpha_i \ge 0}\theta_\mathcal{D}(\alpha,\beta)$.
+
+        It can easily be shown that
+        $$d^*=\max_{\alpha,\beta:\alpha_i\ge 0}\min_w\mathcal{L}(w,\alpha,\beta) \le \min_w\max_{\alpha,\beta:\alpha_i\ge 0}\mathcal{L}(w,\alpha,\beta)=p^*$$
+        However under certain conditions,we will have $d^*=p^*$
+    \end{frame}
+    \begin{frame}[shrink]
+        \frametitle{Lagrange duality(5)}
+        Let's see what these conditions are:
+        \begin{itemize}
+          \item $f$ and the $g_i$'s are convex;
+          \item $h_i$'s are affine;
+          \item $g_i$'s are (strictly) feasible; this means that there exits some $w$ so that $g_i(w)<0$ for all i.
+        \end{itemize}
+        $w^*$,$\alpha^*$ and $\beta^*$ satisfy the \textbf{Karush-Kuhn-Tucker} (\textbf{KKT}) \textbf{conditions}, which are as follows:
+        \begin{eqnarray*}
+            \frac{\partial}{\partial w_i}\mathcal{L}(w^*,\alpha^*,\beta^*) &=& 0,i=1,\ldots,n\\
+            \frac{\partial}{\partial \beta_i}\mathcal{L}(w^*,\alpha^*,\beta^*)&=& 0,i=1,\ldots,l\\
+            \alpha_i^*g_i(w^*) &=& 0,i=1,\ldots,k\\
+            g_i(w^*) &\le& 0,i=1,\ldots,k\\
+            \alpha^* &\ge& 0,i=1,\ldots,k
+        \end{eqnarray*}
+    \end{frame}
+    \begin{frame}
+        \frametitle{The optimal margin classifier(3)}
+        we posed the following (primal) optimization
+         problem for finding the optimal 
+         margin classifier:
+         \begin{eqnarray*}
+         	\min_{\gamma,w,\beta} && \frac{1}{2}\|w\|^2\\
+         	s.t && y^{(i)}(w^Tx^{(i)}+b)\ge 1,i=1,\ldots,m
+         \end{eqnarray*}
+         We can write the constraints as:
+         $$g_i(x)=1-y^{(i)}(w^Tx^{(i)}+1)\le 0,i=1,\ldots,m$$
+         Note that from the KKT condition,we will have $\alpha_i>0$
+         only for that training example that have function margin 
+         exactly equal to one 
+    \end{frame}
+    \begin{frame}
+    	\frametitle{The optimal margin classifier(4)}
+    	\begin{figure}
+           \pgfimage[width=5cm ]{"image/08.png"}
+        \end{figure}
+        The points with the smallest margins are exactly
+         the ones closest to the decision boundary;here,
+          these are the three points which are called 
+          the \textbf{support vectors} in this problem.
+    \end{frame}
+    \begin{frame}[shrink]
+    	\frametitle{The optimal margin classifier(5)}
+    	Construct Lagrangian for our problem:
+    	$$ \mathcal{L}(w,b,\alpha)=\frac{1}{2}
+    	\|w\|^2-\sum_{i=1}^m[y^{(i)}(w^Tx^{(i)}+b)-1]$$
+    	Note that there are only $\alpha_i$ but no $\beta_i$ 
+    	Lagrange multipliers.
+    	To minimize $\mathcal{L}(w,b,\alpha)$ for fix $\alpha$:
+    	$$\nabla_w\mathcal{L}(w,b,\alpha)=w-\sum_{i=1}^m\alpha_i
+    	y^{(i)}x^{(i)}\stackrel{\mathrm{set}}{=}0$$
+    	This implies that:
+    	\begin{eqnarray}
+    		w=\sum_{i=1}^m\alpha_iy^{(i)}x^{(i)}
+    	\end{eqnarray}
+    \end{frame}
+    \begin{frame}[shrink]
+    	\frametitle{The optimal margin classifier(6)}
+    	As for the derivation with respect to b,we obtain:
+    	\begin{equation}
+    		\frac{\partial}{\partial b}\mathcal{L}(w,b,\alpha)=
+    		\sum_{i=1}^m\alpha_iy^{(i)}=0
+    	\end{equation}
+    	Plugging w back into the Lagrangian:
+    	$$\mathcal{L}(w,b,\alpha)=\sum_{i=1}^m\alpha_i-\frac{1}{2}
+    	\sum_{i,j=1}^my^{(i)}y^{(j)}\alpha_i\alpha_j\langle 
+    	x^{(i)},x^{(j)}\rangle$$
+    	We obtain the following dual problem:
+    	\begin{eqnarray*}
+    		\max_\alpha && W(\alpha)=\sum_{i=1}^m\alpha_i-
+    		\frac{1}{2}\sum_{i,j=1}^my^{(i)}y^{(j)}
+    		\alpha_i\alpha_j\langle x^{(i)},x^{(j)}\rangle \\
+    		s.t. && \alpha_i \ge 0,\quad i=1,\ldots,m\\
+    		&& \sum_{i=1}^m\alpha_iy^{(i)}=0
+    	\end{eqnarray*}
+    \end{frame}
+    \begin{frame}[shrink]
+    	\frametitle{The optimal margin classifier(7)}
+    	Having found $w^*$,then we can get $b^*$ as:
+    	$$b^*=-\frac{\max_{i:y^{(i)}=-1}{w^*}^T+\min_{i:y^{(i)}=1}
+    	{w^*}^Tx^{(i)}}{2}$$
+    	Suppose we've fit our model's parameters to a training set
+    	,and now wish to make a prediction at a new point $x$.We
+    	 would calculate $w^Tx+b$,and do prediction.But using (1),
+    	 this quantity can also be written:
+    	$$w^Tx+b=\sum_{i=1}^m\alpha_iy^{(i)}\langle x^{(i)},x\rangle+b$$
+    	Using (2) we saw that the $\alpha_i$'s will all be zero
+    	 except for the support vector.   	     	
+    \end{frame}
+    \begin{frame}
+    	\frametitle{Kernels}
+    	Define \textbf{Kernel} to be:
+    	$$K(x,z)=\phi(x)^T\phi(z)$$
+    	we let $\phi$ denote the \textbf{feature mapping}, which 
+    	maps from the original input value (\textbf{attributes}) to
+    	the features in higher dimensional.
+    	
+    	Let's see an example. Suppose $x,z\in \mathbb{R}^n$, and
+    	consider:
+    	$$K(x,z)=(x^Tz)^2=\sum_{i,j=1}^n(x_ix_j)(z_iz_j)=
+    	\phi(x)^T\phi(z)$$
+    	Thus, we can see feature mapping $\phi$ is given by 
+    	(shown here for the case of $n=3$)
+    	$$\phi(x)=(x_1x_1,x_1x_2,\ldots,x_3x_3)^T$$
+    	
+    	 
+    \end{frame}
+    \begin{frame}[shrink]
+    	\frametitle{Kernels(2)}
+    	Another example:
+    	\begin{eqnarray*}
+    		K(x,z) &=& (x^Tz+c)^2\\
+    		&=& \sum_{i,j=1}^n(x_ix_j)(z_iz_j)+\sum_{i=1}^n
+    		(\sqrt{2c}x_i)(\sqrt{2c}z_i)+c^2
+    	\end{eqnarray*}
+    	feature mapping:(Again shown for $n=3$)
+    	$$\phi(x)=(x_1x_1,x_1x_2,\ldots,x_3x_3,\sqrt{2c}x_1,
+    	\sqrt{2c}x_2,\sqrt{2c}x_3,c)^T$$
+    	More broadly, the kernel $K(x,z)=(x^Tz+c)^d$ corresponds
+    	to a feature mapping to an ${n+d}\choose{d}$ feature space.
+    	
+    	Map attribute to infinity dimension \textbf{Gaussian kernel}:
+    	$$K(x,z)=\exp \left(-\frac{\|x-z\|^2}{2\sigma^2}\right)$$
+    \end{frame}
+    \begin{frame}
+    	\frametitle{Kernels(3)}
+    	More broadly, given some function $K$, how can we tell if 
+    	it's a valid kernel; i.e., can we tell if there is some 
+    	feature mapping $\phi$ so that $K(x,z)=\phi(x)^T\phi(z)$ for
+    	all $x$, $z$?
+    	\\
+    	Consider some finite set of $m$ points $\{x^{(1)},x^{(2)},
+    	\ldots,x^{(m)}\}$, and let a m-by-m matrix $K$ be defined
+    	as
+    	$$K_{ij}=K(x^{(i)},y{(i)})$$
+    	$K$ is called the \textbf{Kernel matrix}.
+    	
+    	Now, if $K$ is a valid Kernel, then 
+    	$$K_{ij}=
+   	    \phi(x^{(i)})^T\phi(x^{(j)})=\phi(x^{(j)})^T\phi(x^{(i)})
+   	    =K_{ji}$$
+   	    Hence, $K$ must be symmetric. 
+    \end{frame}
+    \begin{frame}[shrink]
+    	\frametitle{Kernels(4)}
+    	 More over, letting $\phi_k(x)$
+   	    denote the $k$-th coordinate of the vector $\phi(x)$,we find
+   	    that for any vector $z$, we have
+   	    \begin{eqnarray*}
+   	    	z^TKz &=& \sum_i\sum_jz_iK_{ij}z_j\\
+   	    	&=& \sum_i\sum_jz_i\phi(x^{(i)})^T\phi(x^{(j)})z_j\\
+   	    	&=& \sum_i\sum_jz_i\sum_k\phi_k(x^{(i)})^T\phi_k(x^{(j)})
+   	    	z_j\\
+   	    	&=& \sum_k\sum_i\sum_jz_i\phi_k(x^{(i)})^T\phi_k(x^{(j)})
+   	    	z_j\\
+   	    	&=& \sum_k\left(\sum_iz_i\phi_k(x^{(i)})\right)^2 \ge 0
+   	    \end{eqnarray*}
+   	    This shows that K is positive semi-definite
+   	    $$$$    	
+    \end{frame}
+    \begin{frame}
+    	\frametitle{Kernels(5)}
+    	\textbf{Theorem (Mercer).} Let $K:\mathbb{R}^n\times
+    	\mathbb{R}^n\rightarrow\mathbb{R}$ be given. Then for
+    	$K$ to be a valid (Mercer) Kernel, it is necessary and 
+    	sufficient that for any $\{x^{(1)},\ldots,x^{(m)}\},
+    	(m<\infty)$,the corresponding kernel matrix is symmetric
+    	positive semi-definite.
+    \end{frame}
+    \begin{frame}[shrink]
+    	\frametitle{Regularization and the non-separable case}
+    	\begin{figure}
+           \pgfimage[width=7cm ]{"image/09.png"}
+        \end{figure}
+        To make the algorithm work for non-linearly separable 
+        datasets as well as be less sensitive to outliers, we
+        reformulate our optimization ($l_1$ \textbf{regularization}):
+        \begin{eqnarray*}
+        	\min_{\gamma,w,b} && \frac{1}{2}\|w\|^2+C\sum_{i=1}^m\xi_i\\
+        	s.t && y^{(i)}(w^Tx^{(i)}+b)\ge 1-\xi_i,i=1,\ldots,m\\
+        	&& \xi_i \ge 0,i=1,\ldots,m
+        \end{eqnarray*}
+        
+        
+    \end{frame}
+ 	\begin{frame}[shrink]
+ 		\frametitle{Regularization and the non-separable case(2)}
+ 		As before, we can form the Lagrangian:
+ 		$$\mathcal{L}(w,b,\xi,\alpha,\gamma)=\frac{1}{2}w^Tw+
+ 		C\sum_{i=1}^m\xi_i-\sum_{i=1}^m\alpha_i\big(y^{(i)}
+ 		(x^Tw+b)-1+\xi_i\big)-\sum_{i=1}^m\gamma_i\xi_i$$
+ 		Here, the $\alpha_i$'s and $\gamma_i$'s are our
+ 		Lagrangian multipliers.
+ 		
+ 		After some work,we obtain the dual form of the problem:
+ 		\begin{eqnarray*}
+ 			\max_\alpha && W(\alpha)=\sum_{i=1}^m\alpha_i-
+ 			\frac{1}{2}\sum_{i,j=1}^my^{(i)}y^{(j)}\alpha_i
+ 			\alpha_j\langle x^{(i)},x^{(j)}\rangle \\
+ 			s.t. && 0\le \alpha_i \ge C,i=1,\ldots,m\\
+ 			&& \sum_{i=1}^m\alpha_iy^{(i)}=0
+ 		\end{eqnarray*}
+	\end{frame} 
+	
+	\begin{frame}
+		\frametitle{The SMO algorithm}
+		Consider trying to solve the 
+		unconstrained optimization problem
+		$$\max_\alpha W(\alpha_1,\alpha_2,\ldots,\alpha_m).$$
+		The algorithm here is called \textbf{coordinate ascent}:
+		\begin{figure}
+           \pgfimage[width=9cm ]{"image/10.png"}
+        \end{figure}
+	\end{frame}
+	\begin{frame}
+		\frametitle{The SMO algorithm(2)}
+		\begin{figure}
+           \pgfimage[width=7cm ]{"image/11.png"}
+        \end{figure}
+        The ellipses in the figure are the contours of 
+        a quadratic function that we want to optimize.
+	\end{frame}
+	\begin{frame}
+		\frametitle{The SMO algorithm(3)}
+		\begin{figure}
+           \pgfimage[width=10cm ]{"image/12.png"}
+        \end{figure}
+	\end{frame}
+	\subsection{Learning Theory}
+	\begin{frame}
+		\frametitle{Bias/variance tradeoff}
+		\begin{figure}
+           \pgfimage[width=10cm ]{"image/13.png"}
+           \begin{itemize}
+           	\item The linear model suffers from large bias, and may 
+           	underfit the data.
+           	\item The 5th order polynomial model suffers from large 
+           	variance, and may overfit the data.
+           \end{itemize}
+        \end{figure}
+	\end{frame}	
+	\begin{frame}
+		\frametitle{Preliminaries}
+		\textbf{Lemma.} (The union bound). Let $A_1,A_2,\ldots,A_k$ 
+		be $k$ different events (that may not be independent). Then
+		$$P(A_1\cup\ldots\cup A_k)\le P(A_1)+\ldots+P(A_k)$$
+		\textbf{Lemma.} (Hoeffding inequality) Let $Z_1,\ldots,Z_m$ 
+		be the $m$ independent and identically distributed (iid) random
+		variables drawn from a $\mathrm{Bernoulli} (\phi)$ distribution.
+		I.e., $P(Z_i=1)=\phi$, and $P(Z_i=0)=1-\phi$. Let $\hat{\phi}
+		=(1/m)\sum_{i=1}^mZ_i$ be the mean of these random variables,
+		and let any $\gamma >0$ be fixed. Then
+		$$P(|\phi-\hat{\phi}|>\gamma)\le 2\exp(-2\gamma^2m)$$
+		
+	\end{frame}
+	\begin{frame}
+		\frametitle{Preliminaries(2)}
+		We assume we are given a training set $S=\{(x^{(i)},y^{(i)});
+		i=1,\ldots,m\}$ of size m, where the training examples $(x^{(i)},
+		y^{(i)})$ are drawn iid from some probability distribution
+		$\mathcal{D}$. For a hypothesis h, we define the \textbf{
+		training error} (also called the \textbf{empirical risk} or
+		\textbf{empirical error} in learning theory) to be
+		$$\hat{\varepsilon}(h)=\frac{1}{m}\sum_{i=1}^m1\{
+		h(x^{(i)}) \neq y^{(i)}\}$$
+		Here $1\{condition\}$ means, if condition is true then 
+		$1\{condition\}=1$, otherwise $1\{condition\}=0$. 
+		
+		Define \textbf{generalization error} to be
+		$$\varepsilon(h)=P_{(x,y)\sim \mathcal{D}}(h(x)\neq y)$$
+	\end{frame}
+	\begin{frame}[shrink]
+		\frametitle{Empirical risk minimization (ERM)}
+		We define the \textbf{hypothesis class} $\mathcal{H}$ used 
+		by a learning algorithm to be the set of all classifiers
+		considered by it. For linear classification, $\mathcal{H}=
+		\{h_w:h_w(x)=1\{w^Tx \ge 0\},w\in\mathbb{R}^{n+1}\}$.
+		
+		Empirical risk minimization can now be thought of as a minimization over
+		the class of functions $\mathcal{H}$:
+		$$\hat{h}=\mathrm{arg}\min_{h\in\mathcal{H}}\hat{\varepsilon}(h)$$
+		Let's consider the case of finite $\mathcal{H}=\{h_1,\ldots,h_k\}$
+		. Take any one, fixed, $h_i\in \mathcal{H}$. Consider a Bernoulli
+		random variable $Z_j=1\{h_i(x^{(i)})\neq y^{(j)}\}$, then the
+		training error can be written
+		$$\hat{\varepsilon}(h_i)=\frac{1}{m}\sum_{j=1}^mZ_j$$
+		Since our training set was drawn idd from $\mathcal{D}$
+		$$\varepsilon(h_i)=E[Z_j]=P(Z_j=1)$$
+	\end{frame}	
+	\begin{frame}[shrink]
+		\frametitle{Empirical risk minimization (ERM)(2)}
+		We can apply the Hoeffding inequality, and obtain
+		$$P(|\varepsilon(h_i)-\hat{\varepsilon}(h_i)|>\gamma) \le 
+		2\exp(-2\gamma^2m)$$
+		Let $A_i$ denote the event that $|\varepsilon(h_i)-\hat{
+		\varepsilon(h_i)}|>\gamma$. 
+		Using the union bound, we have
+		\begin{eqnarray*}
+			P(\exists h \in \mathcal{H}.|\varepsilon(h_i)-
+			\hat{\varepsilon}(h_i)|>\gamma) &=& P(A_1 \cup \ldots \cup
+			A_k)\\
+			&\le& \sum_{i=1}^kP(A_i)\\
+			&\le& \sum_{i=1}^k2\exp(-2\gamma^2m)\\
+			&=& 2k\exp(-2\gamma^2m)
+		\end{eqnarray*}
+		
+	\end{frame}	
+	\begin{frame}[shrink]
+		\frametitle{Empirical risk minimization (ERM)(3)}
+		Subtract both sides from 1, we obtain
+		\begin{eqnarray*}
+			P(\neg\exists h \in \mathcal{H}.|\varepsilon(h_i)-
+			\hat{\varepsilon}(h_i)|>\gamma) &=& P(\forall \in \mathcal{H}.
+			|\varepsilon(h_i)-\hat{\varepsilon}(h_i)|\le \gamma)\\
+			&\ge& 1-2k\exp(-2\gamma^2m)
+		\end{eqnarray*}
+		So, with probability at least $1-2k\exp(-2\gamma^2m)$ we have
+		that $\varepsilon(h)$ will be within $\gamma$ of $\hat{\varepsilon(h)}$
+		for all $h \in \mathcal{H}$. This is called a \textbf{uniform
+		convergence result}.
+		
+		Given $\gamma$ and some $\delta >0$, by setting $\delta = 
+		2k\exp(-2\gamma^2m)$,we find that if
+		$$m \ge \frac{1}{2\gamma^2}\log\frac{2k}{\delta},$$
+		then with probability at least $1-\delta$, we have that
+		$|\varepsilon(h)-\hat{\varepsilon}(h)| \le \gamma$ for all
+		$h \in \mathcal{H}$.
+		
+		The training set size $m$ that a certain method or algorithm
+		requires in order to achieve a certain level if performance
+		is also called the algorithm's \textbf{sample complexity}.
+		$$$$		
+	\end{frame}
+	\begin{frame}
+		\frametitle{Empirical risk minimization (ERM)(4)}
+		Similarly,we can also hold $m$ and $\delta$ fixed and solve
+		for $\gamma$.
+		$$|\hat{\varepsilon(h)}-\varepsilon(h)| \le \gamma \le \sqrt{
+		\frac{1}{2m}\log\frac{2k}{\delta}}$$
+		Define $h^*=\mathrm{arg}\min_{h\in \mathcal{H}}\varepsilon(h)$.
+		We have:
+			$$\varepsilon(\hat{h}) \le \hat{\varepsilon}(\hat{h})+\gamma
+			\le \hat{\varepsilon}(h^*)+\gamma \le \varepsilon(h^*)+2\gamma $$ 
+		\textbf{Theorem.} Let $|\mathcal{H}|=k$, and let any $m$, 
+		$\delta$ be fixed. Then with probability at least $1-\delta$,
+		we have that
+		$$\varepsilon(\hat{h})\le \left(\min_{h \in \mathcal{H}}
+		\varepsilon(h)\right)+2\sqrt{\frac{1}{2m}\log\frac{2k}{\delta}}$$
+	\end{frame}
+	\begin{frame}
+		\frametitle{Empirical risk minimization (ERM)(5)}
+		Given a set $S=\{x^{(1)},\ldots,x^{(d)}\}$, we say that $\mathcal{H}$
+		\textbf{shatters} $S$ if $\mathcal{H}$ can realize any labelling
+		on $S$. I.e., if for any set of labels $\{y^{(1)},\ldots,
+		y^{(d)}\}$, there exists some $h\in\mathcal{H}$ so that
+		$h(x^{(i)})=y^{(i)}$ for all $i=1,\ldots,d$. 
+		
+		Given a hypothesis class $\mathcal{H}$, we can define its
+		\textbf{Vapnik- Chervonenkis dimension}, written $VC(\mathcal{H})$,
+		to be the size of the largest set that is shattered by $\mathcal{H}$.
+		
+		\textbf{Theorem.} Let $\mathcal{H}$ be given, and let $d = 
+		VC(\mathcal{H})$. Then with probability at least $1-\delta$, 
+		we have that for all $h\in\mathcal{H}$,
+		$$|\epsilon(h)-\hat{\epsilon}(h)| \le O\left(\sqrt{
+		\frac{d}{m}\log{\frac{m}{d}}+\frac{1}{m}\log\frac{1}{\delta}}
+		\right).$$
+	\end{frame}	
+	\begin{frame}
+		\frametitle{Empirical risk minimization (ERM)(6)}
+		Thus, with probability at least $1-\delta$, we also have that:
+		$$\epsilon(\hat{h})\le \epsilon(h^*)+O\left(\sqrt{
+		\frac{d}{m}\log{\frac{m}{d}}+\frac{1}{m}\log\frac{1}{\delta}}
+		\right).$$
+		\textbf{Corollary.} For $|\epsilon(h)-\hat{\epsilon}(h)|\le 
+		\gamma$ to hold all $h\in\mathcal{H}$ with probability at 
+		least $1-\delta$, it suffices that $m=O_{\gamma,\delta}(d)$.
+	\end{frame}						   
+	\section{Unsupervised Learning}
+	\begin{frame}
+		In Mixture densities we have some assumptions.
+		\begin{itemize}
+			\item[1.] The samples come from a known number of classes.
+			\item[2.] The prior probabilities $P(\omega_j)$ for each class are known, $j=1,\ldots,c$.
+			\item[3.] The forms for the class-conditional probability densities $p(x|\omega_j,\theta_j)$ are known, $j=1,\ldots,c$.
+			\item[4.] The values for the c parameter vectors. $\theta_1,\ldots,\theta_c$ are unknown.
+			\item[5.] The category labels are unknown.
+		\end{itemize}
+		Samples are assumed to be obtained by selecting state if nature $\omega_j$ with probability $P(\omega_j)$ and then selecting an x according to the probability law $p(x|\omega_j,\theta_j)$. Thus probability density function for the samples is given by
+		$$p(x|\theta)=\sum_{j=1}^{c}p(x|\omega_j,\theta_j)P(\omega_j)$$
+	\end{frame}
+	\begin{frame}
+		\textbf{Definition}: A density $p(x|\theta)$ is said to be \textit{identifiable} if $\theta \neq \theta'$ implies that there exists an $x$ such that $p(x|\theta) \neq p(x|\theta')$. 
+		
+		Or put another way, a density $p(x|\theta)$ is \textit{not identifiable} if we cannot recover a unique $\theta$.
+		
+		A example for unidentifiable:
+		\begin{eqnarray*}
+			P(x|\theta) &=& \frac{1}{2}\theta_1^x(1-\theta_1)^{1-x}+\frac{1}{2}\theta_2^x(1-\theta_2)^{1-x}\\
+			&=& \left\{\begin{array}{ll}
+				\frac{1}{2}(\theta_1+\theta_2) & \mbox{if $x=1$;}\\
+				1-\frac{1}{2}(\theta_1+\theta_2) & 	\mbox{if $x=0$.}
+			\end{array}
+			\right.
+		\end{eqnarray*}
+		Suppose, for example, that we know for our data that P(x = 1|θ) = 0.6, and hence that $P(x=0|\theta)=0.4$. Then we know the function $P(x|\theta)$, but we cannot determine $\theta$, and hence cannot extract the component distributions. The most we can say is that $\theta_1+\theta_2=1.2$. Thus, here we have a case in which the mixture distribution is completely unidentifiable.
+	\end{frame}
+	\begin{frame}
+		Suppose now that we are given a set $\mathcal{D}=\{x_1,\ldots,x_n\}$ of $n$ unlabeled samples drawn independently from mixture density.
+		$$p(x|\theta) = \sum_{j=1}^cp(x|\omega_j,\theta_j)P(\omega_j)$$
+		where the full parameter vector $\theta$ is fixed but unknown. The likelihood of the observed samples is, by definition, the joint density
+		$$p(\mathcal{D}|\theta)\equiv\prod_{k=1}^np(x_k|\theta)$$
+		The maximum-likelihood estimate $\hat{\theta}$ is that value of $\theta$ that maximizes $p(\mathcal{D}|\theta)$.
+	\end{frame}
+	\begin{frame}
+		The Log maximum-likelihood:
+		$$l=\sum_{k=1}^n\log p(x_k|\theta)$$
+		and
+		\begin{eqnarray*}
+			\nabla_{\theta_i}l &=& \sum_{k=1}^n\frac{1}{p(x_k|\theta)}\nabla_{\theta_i}\left(\sum_{j=1}^cp(x_k|\omega_j,\theta_j)P(\omega_j)\right)\\
+			&=& \sum_{k=1}^n\frac{1}{p(x_k|\theta)}\nabla_{\theta_i}p(x_k|\omega_i)P(\omega_i)
+		\end{eqnarray*}
+		Here we assume that $\theta_i$  and $\theta_j$ are independent if $i\neq j$.
+	\end{frame}
+	\begin{frame}
+		According the Bayes' formula,
+		$$P(\omega_i|x_k,\theta)=\frac{p(x_k|\omega_i,\theta_i)P(\omega_i)}{p(x_k|\theta)}$$
+		Hence,
+		$$\nabla_{\theta_i}l=\sum_{k=1}^nP(\omega_i|x_k,\theta)\nabla_{\theta_i}\log p(x_k|\omega_i,\theta_i)$$
+		and $P(\omega_i)$ can be estimate by $P(\omega_i|x_k)$:
+		$$p(\omega_i)=\frac{1}{n}\sum_{k=1}^nP(\omega_i|x_k,\theta)$$ 
+	\end{frame}
+	\subsection{The EM algorithm}
+	\begin{frame}
+		\frametitle{Mixtures of Gaussians and the EM algorithm}
+		Suppose that we are given a training set $\{x^{(1)},
+		\ldots,x^{(m)}\}$, we wish to model the data by specifying
+		a joint distribution $p(x^{(1)},z^{(i)})=p(x^{(i)}|z^{(i)})$.
+		Here, 
+		\begin{eqnarray*}
+			z^{(i)}\in\{1,\ldots,k\}&\sim&\mathrm{Multinomial}(\phi),\\
+			x^{(i)}|z^{(i)}=j&\sim&\mathcal{N}(\mu_j,\Sigma_j)
+		\end{eqnarray*}
+		This is call the \textbf{mixture of Gaussians} model, and
+		$z^{(i)}$'s are \textbf{latent} random variables.
+		To estimate $\phi$, $\mu$ and $\Sigma$, we can write down
+		the likelihood of our data.
+		\begin{eqnarray*}
+			l(\phi,\mu,\Sigma) &=& \sum_{i=1}^m\log p(x^{(i)};
+			\phi,\mu,\Sigma)\\
+			&=& \sum_{i=1}^m\log\sum_{z^{(i)}=1}^kp(x^{(i)}|z^{(i)};
+			\mu,\Sigma)p(z^{(i)};\phi) 
+		\end{eqnarray*}		 
+		
+	\end{frame}
+	\begin{frame}[shrink]
+		\frametitle{Mixtures of Gaussians and the EM algorithm(2)}
+		Note that if we knew what the $z^{(i)}$'s were, the maximum
+		likelihood problem would have been easy. Specifically, we
+		could then write down the likelihood as
+		$$l(\phi,\mu,\Sigma)=\sum_{i=1}^m\log p(x^{(i)}|z^{(i)};\mu,
+		\Sigma)+\log p(z^{(i)};\phi)$$
+		Maximizing this with respect to $\phi$, $\mu$ and $\Sigma$ 
+		gives the parameters.
+		\begin{eqnarray*}
+			\phi_j &=& \frac{1}{m}\sum_{i=1}^m1\{z^{(i)}=j\}\\
+			\mu_j &=& \frac{\sum_{i=1}^m1\{x^{(i)}=j\}x^{(i)}}{
+			\sum_{i=1}^m1\{z^{(i)}=j\}}\\
+			\Sigma_j &=& \frac{\sum_{i=1}^m1\{z^{(i)}=j\}(x^{(i)}-
+			\mu_j)(x^{(i)}-\mu_j)^T}{\sum_{i=1}^m1\{z^{(i)}=j\}}
+		\end{eqnarray*}
+	\end{frame}	
+	\begin{frame}
+		\frametitle{Mixtures of Gaussians and the EM algorithm(3)}
+		The EM algorithm is an iterative algorithm that has two main
+		step.
+		\begin{figure}
+           \pgfimage[width=9cm ]{"image/14.png"}
+        \end{figure}
+	\end{frame}	
+	\begin{frame}
+		\frametitle{Jensen’s inequality}
+		\textbf{Theorem.} Let f be a convex(concave) function, and let X be
+		a random variable. Then:
+		$$E[f(X)]\ge f(EX)\quad\mbox{ (Concave case is $E[f(X)]\le f(EX)$ )}$$
+		Moreover, if $f$ is strictly convex(concave), then $E[f(X)]=f(EX)$ 
+		holds true if and only if $X=E[X]$ with probability 1.
+		\begin{figure}
+           \pgfimage[width=5cm ]{"image/15.png"}
+        \end{figure}
+	\end{frame}
+	\begin{frame}[shrink]
+		\frametitle{The EM algorithm}
+		Suppose we have a training set $\{x^{(i)},\ldots,x^{(m)}\}$.
+		We wish to fit the parameters of a model p(x,z) to the data,
+		where the likelihood is given by
+		$$l(\theta)=\sum_{i=1}^m\log p(x;\theta)=\sum_{i=1}^m
+		\log\sum_zp(x,z;\theta).$$
+		For each $i$, let $Q_i$ be some distribution over the $z$'s(
+		$\sum_zQ_i(z)=1, Q_i(z)\ge 0$. Consider:
+		\begin{eqnarray}
+			\sum_i\log p(x^{(i)};\theta) &=& \sum_i\log\sum_{z^{(i)}}
+			p(x^{(i)},z^{(i)};\theta)\\
+			&=& \sum_i\log\sum_{z^{(i)}}Q_i(z^{(i)})\frac{p(x^{(i)},
+			z^{(i)};\theta)}{Q_i(z^{i})}\\
+			&=& \sum_i\log E_{z^{(i)}\sim Q_i}[\frac{p(x^{(i)},
+			z^{(i)};\theta)}{Q_i(z^{(i)})}]\\
+			&\ge& \sum_i\sum_{z^{(i)}}Q_i(z^{(i)})\log\frac{p(x^{(i)},
+			z^{(i)};\theta)}{Q_i(z^{(i)})}
+		\end{eqnarray}
+	\end{frame}
+	\begin{frame}[shrink]
+		\frametitle{The EM algorithm(2)}
+		To make the bound tight,we need Jensen's inequality to hold
+		equality.we require that
+		$$\frac{p(x^{(i)},z^{(i)})}{Q_i(z^{(i)})}=c$$
+		for some constant c that not depend on $z^{(i)}$
+		$$Q_i(z^{(i)})\propto p(x^{(i)},z^{(i)};\theta)$$
+		Actually,since $\sum_zQ_i(z^{(i)})=1$:
+		\begin{eqnarray*}
+			Q_i(z^{(i)}) &=& \frac{p(x^{(i)},z^{(i)};\theta)}{
+			\sum_zp(x^{(i)},z;\theta)}\\
+			&=& \frac{p(x^{(i)},z^{(i)};\theta)}{p(x^{(i)};\theta)}=
+			p(z^{(i)}|x^{(i)};\theta)
+		\end{eqnarray*}
+	\end{frame}	
+	\begin{frame}[shrink]
+		\frametitle{The EM algorithm(3)}
+		Generalized EM algorithm:
+		\begin{figure}
+           \pgfimage[width=8cm ]{"image/16.png"}
+        \end{figure}
+        If we define
+        $$J(Q,\theta)=\sum_i\sum_{z^{(i)}}Q_i(z^{(i)})\log\frac{
+        p(x^{(i)},z^{(i)};\theta)}{Q_i(z^{(i)})}.$$
+        the EM can also be viewed a coordinate ascent on J.
+        $$$$
+	\end{frame}
+	\section{Graphical Model}
+	\begin{frame}
+		\frametitle{The envelope quiz}
+		\begin{figure}
+			
+			\pgfimage[width=8cm ]{"image/22.png"}
+			
+		\end{figure}
+		\begin{itemize}
+			\item red ball is goal
+			\item You randomly picked an envelop randomly took out a ball and it was black
+			\item Should you choose this envelope or the other envelope?
+		\end{itemize}
+	\end{frame}
+	\begin{frame}
+		\frametitle{The envelope quiz(2)}
+		\begin{itemize}
+			\item Probabilistic inference
+			\begin{itemize}
+				\item Joint distribution on $E\in\{1,0\},B\in\{r,b\}$: $P(E,B)=P(E)P(B|E)$
+				\item $P(E=1)=P(E=0)=\frac{1}{2}$
+				\item $P(B=r|E=1)=\frac{1}{2},P(B=r|E=0)=0$
+				\item The graphical model:
+				\begin{figure}
+					
+					\pgfimage[width=1cm ]{"image/23.png"}
+					
+				\end{figure}
+				
+			\end{itemize}
+			\item Statistical decision theory: switch if $P(E=1|B=b) < \frac{1}{2}$
+			\item $P(E=1|B=b)=\frac{P(B=b|E=1)P(E=1)}{P(B=b)}=\frac{1}{3}$
+		\end{itemize}
+	\end{frame}
+	\begin{frame}
+		\frametitle{Some concepts}
+		\begin{itemize}
+			\item The world is reduced to a set of random variables $x_1,\ldots,x_d$
+			\begin{itemize}
+				\item e.g. $(x_1,\ldots,x_{d-1}) $ is a feature vector, $x_d\equiv y$ is the class label.
+			\end{itemize}
+			\item Inference: given joint distribution $p(x_1,\ldots,x_d),$ compute $p(X_Q|X_E)$ where $X_Q\cup X_E \subseteq \{x_1,\ldots,x_d\}$
+			\begin{itemize}
+				\item e.g. $Q=\{x_d\},E=\{x_1,\ldots,x_{d-1}\},$ by the definition of conditional
+				$$p(x_d|x_1,\ldots,x_{d-1})=\frac{p(x_1,\ldots,x_d)}{\sum_vp(x_1,\ldots,x_{d-1},x_d=v)}$$
+			\end{itemize}
+			\item Learning estimate $p(x_1,\ldots,x_d)$ from training data $\{x^{(1)},\ldots,x^{(m)}\}$
+		\end{itemize}
+	\end{frame}
+	\begin{frame}
+		\frametitle{What are graphical models?}
+		\begin{itemize}
+			\item Graphical model = joint distribution $p(x_1,\ldots,x_d)$
+			\begin{itemize}
+				\item Bayesian network
+				\item Markov random field
+			\end{itemize}
+			\item Inference = $p(X_Q|X_E)$, in general $X_Q\cup X_E \subseteq \{x_1,\ldots,x_d\}$
+			\item If $p(x_1,\ldots,x_d) not given, estimate it from data$
+			\begin{itemize}
+				\item parameter and structure learning
+			\end{itemize}
+		\end{itemize}
+	\end{frame}
+	\begin{frame}
+		\frametitle{What are graphical models?(2)}
+		\begin{itemize}
+			\item Graphical model is the study of probabilistic models
+			\item Just because there are nodes and edges doesn't mean it's a graphical model
+			\item These are not graphical models:
+			\begin{figure}
+				
+				\pgfimage[width=10cm ]{"image/24.png"}
+				
+			\end{figure}
+		\end{itemize}
+	\end{frame}
+	\begin{frame}
+		\frametitle{Directed graphical models}
+		\begin{itemize}
+			\item Also called Bayesian networks
+			\item A directed graph has nodes $x_1,\ldots,x_d$, some of them connected by directed edges $x_i\rightarrow x_j$
+			\item A cycle is a directed path $x_1\rightarrow\ldots\rightarrow x_k$ where $x_1=x_k$
+			\item A directed acyclic graph (DAG) contains no cycles 
+		\end{itemize}
+	\end{frame}
+	\begin{frame}
+		\frametitle{Directed graphical models(2)}
+		\begin{itemize}
+			\item A Bayesian network on the DAG is a family of distributions satisfying
+			$${p|p(x_1,\ldots,x_d)=\prod_ip(x_i|Pa(x_i))}$$
+			where $Pa(x_i)$ is the set of parents of $x_i$
+			\item $p(x_i|Pa(x_i))$ is the conditional probability distribution (CPD) at $x_i$
+			\item By specifying the CPDs for all $i$, we specify a joint distribution $p(x_1,\ldots,x_d)$
+		\end{itemize}
+	\end{frame}
+	\begin{frame}
+		\frametitle{Example:Burglary, Earthquake, Alarm, John and Marry}
+		\begin{figure}
+			
+			\pgfimage[width=8cm ]{"image/25.png"}
+			
+		\end{figure}
+		$$P(B,\sim E,A,J,\sim M) = P(B)P(\sim E)P(A|B,\sim E)P(J|A)P(\sim M|A)$$
+	\end{frame}
+	\begin{frame}
+		\frametitle{Example: Naive Bayes}
+		\begin{figure}
+			
+			\pgfimage[width=8cm ]{"image/26.png"}
+			
+		\end{figure}
+		\begin{itemize}
+			\item $p(y,x_1,\ldots,x_d)=p(y)\prod_{i=1}^{d}p(x_i|y)$
+			\item Plate representation on the right
+			\item $p(y)$ multinomial
+			\item $p(x_i|y)$ depends on the feature type.
+		\end{itemize}
+	\end{frame}
+	\begin{frame}
+		\frametitle{Undirected graphical models}
+		\begin{itemize}
+			\item Also known as Markov Random Fields
+			\item A clique C in an undirected graph is a set of fully connected nodes (full of loops!)
+			\item Define a nonnegative potential function $\psi_C:X_C\rightarrow \mathbb{R_+}$
+			\item An undirected graphical model is a family of distributions satisfying
+			$$\left\{p|p(X)=\frac{1}{Z}\prod_C\psi_C(X_c)\right\}$$
+			\item $Z=\int\prod_C\psi_C(X_C)dX$
+		\end{itemize}
+	\end{frame}
+	\begin{frame}
+		\frametitle{A Tiny Markov Random Field}
+		\begin{figure}
+			
+			\pgfimage[width=5cm ]{"image/27.png"}
+			
+		\end{figure}
+		\begin{itemize}
+			\item $x_1,x_2\in \{-1,1\}$
+			\item A single clique $\psi_C(x_1,x_2)=e^{ax_1x_2}$
+			\item $p(x_1,x_2) = \frac{1}{Z}e^{ax_1x_2}$
+			\item $Z=(2e^a+2e^{-a})$
+			\item $p(1,1)=p(-1,-1)=\frac{e^a}{2e^a+2e^{-a}}$
+		\end{itemize}
+	\end{frame}
+	\section{Topic Model}
+	\begin{frame}
+		\begin{itemize}
+			\frametitle{Topic Model}
+			\item A topic is defined as a probability distribution over terms or a cluster of weighted terms.
+			\item A document is defined as a set of words generated from a mixture of latent topics.
+		\end{itemize}
+		Various topic modeling methods, such as PLSI, LDA, LSI, NMF, and RLSI have been proposed and successfully applied to different applications.
+	\end{frame}
+	\begin{frame}
+		\frametitle{Probabilistic Topic Models}
+		Suppose that $\mathcal{D}=\{d_1,d_2,\ldots,d_N\}$ is a set of documents with size $N$ and $\mathcal{V}$ is a set of terms or words with size $M$, i.e., the vocabulary. A document $d\in\mathcal{D}$ consists of $|d|$ words from the vocabulary, denoted as $d=(w_1,w_2,\ldots,w_{|d|})$.
+		Suppose that there are $K$ topics in the document collection.
+		
+		PLSI is one of the widely used probabilistic topic models. One can generate the documents in the collection in the following way.
+		\begin{itemize}
+			\item select a document $d$ from the collection with probability $P(d)$
+			\item select a latent topic $z$ with probability $P(z|d)$
+			\item generate a word $w$ with probability $P(w|z)$
+		\end{itemize}
+		Here $z\in \{z_1,\ldots,z_K\}$ is a latent variable representing a topic.
+		
+		
+	\end{frame}	
+	\begin{frame}
+		\frametitle{Probabilistic Topic Models(2)}
+		The parameters of $P(d)$, $P(w|z)$, and $P(z|d)$ can be estimated by EM algorithm.
+		\begin{figure}
+			\pgfimage[width=6cm ]{"image/19.png"}
+		\end{figure}
+	\end{frame}
+	\begin{frame}
+		\frametitle{Probabilistic Topic Models(3)}
+		LDA Model:
+		\begin{figure}
+			\pgfimage[width=6cm ]{"image/20.png"}
+		\end{figure}
+		\begin{itemize}
+			\item[1.] for each topic $k=1,\ldots,K$
+			%\subitem[(a)] draw 
+			\begin{itemize}
+				\item[(a)] draw word distribution $\phi_k$ according to $\phi_k|\beta\sim\mathrm{Dir}(\beta)$
+			\end{itemize}
+			\item[2.] for each document $d$ in the collection
+			\begin{itemize}
+				\item[(a)] draw topic distribution $\theta$ according to $\theta|\alpha\sim\mathrm{Dir}(\alpha)$
+				\item[(b)] for each word w in the document d
+				\begin{itemize}
+					\item[i.] draw a topic $z$ according to $z|\theta\sim\mathrm{Mult}(\theta)$
+					\item[ii.] draw a word $w$ according to $w|z\sim\mathrm{Mult}(\phi_z)$
+				\end{itemize}
+			\end{itemize}
+		\end{itemize}
+	\end{frame}
+	\begin{frame}
+		\frametitle{Non-probabilistic Topic Models}
+		Non-probabilistic topic models are usually obtained by matrix factorization.Suppose that $\mathcal{D}$ is a set of document with size $N$, and $\mathcal{V}$ is a vocabulary with size $M$.The document collection $\mathcal{D}$ is represented as an $M\times N$ matrix $D=(d_1,\ldots,d_N)$. 
+		
+		Suppose that there are $K$ topics represented as an $M\times K$ term-topic matrix $U=(u_1,\ldots,u_K)$. $V^T=(v_1,\ldots,v_N)$ is an $K\times N$ topic-document matrix.
+		
+		Our goal is to factor matrix $D$ by $U$ and $V^T$.
+		$$D\approx UV^T$$
+	\end{frame}
+	\begin{frame}
+		\frametitle{Non-probabilistic Topic Models(2)}
+		LSI assumes that the $K$ columns of matrix $U$ as well as the $K$ columns of matrix $V$ are orthonormal. LSI amounts to minimizing the following objective function with the orthonormal constraints.
+		
+		$$ \min_{U,V}\|D-U\Sigma V^T\|_F$$
+		$$ s.t.\quad U^T \times U=I, V\times V^T=I, \mbox{and $\Sigma$ is diagonal} $$
+		\begin{figure}
+			\pgfimage[width=8cm ]{"image/21.png"}
+		\end{figure}
+
+	\end{frame}
+	\section{Maximum Entropy Models}
+	\begin{frame}
+		\frametitle{What is entropy}
+		In thermodynamics, entropy (usual symbol $S$) is a measure of the number of specific ways in which a thermodynamic system may be arranged, commonly understood as a measure of disorder.
+		$$\Delta = \int\frac{dQ_{rev}}{T}$$
+		In information theory, \textbf{Entropy} is a measure of unpredictability of information content. Shannon defined the entropy $H$ of a discrete random variable $X$ with possible values $x1, ..., xn$ and probability mass function P(X) as:
+		$$H(X) = E[I(X)] = E[-\ln(P(X))]$$
+		Here $I$ is the information content of X.
+		
+	\end{frame}
+	
+	\begin{frame}
+		\frametitle{What is entropy(2)}
+		When taken from a finite sample, the entropy can explicitly be written as
+		$$H(X) = \sum_i P(x_i)I(x_i) = -\sum_i P(x_i)\log_b P(x_i)$$
+		Common values of $b$ are 2, $e$, and 10, and the unit of entropy is bit for $b = 2$, nat for $b = e$, and dit (or digit) for $b = 10$.
+		\begin{figure}
+			\pgfimage[width=4cm ]{"image/28.png"}
+		\end{figure}
+		
+	\end{frame}
+	
+	\begin{frame}[shrink]
+		\frametitle{Whis is entropy(3)}
+		According the definition of $H(X)$, we can define \textbf{Joint Entropy} as:
+		$$H(X,Y) = -\sum_{x,y}p(x,y)\log p(x,y)$$
+		and  define \textbf{Conditional Entropy} to measure unpredictability of random variable $Y$ given random variable $X$ as:
+		$$H(Y|X) = -\sum_{x,y} p(x,y)\log p(y|x)$$
+		The entropy or the amount of information revealed by evaluating $(X,Y)$ (that is, evaluating $X$ and $Y$ simultaneously) is equal to the information revealed by conducting two consecutive experiments: first evaluating the value of $Y$, then revealing the value of $X$ given that you know the value of $Y$. This may be written as
+		\begin{equation}
+			H(X,Y) = H(X|Y)+H(Y)=H(Y|X)+H(X)
+		\end{equation}	
+	\end{frame}
+	
+	\begin{frame}[shrink]	
+		\frametitle{Whis is entropy(4)}
+		We can get (7) by:
+		\begin{eqnarray*}
+			&& H(X,Y)-H(X) \\
+			&=& -\sum_{x,y}p(x,y)\log p(x,y) + \sum_x p(x)\log p(x)\\
+			&=& -\sum_{x,y}p(x,y)\log p(x,y) + \sum_x\left(\sum_y p(x,y)\right)\log p(x)\\
+			&=& -\sum_{x,y}p(x,y)\log p(x,y)+ -\sum_{x,y}p(x,y)\log p(x)\\
+			&=& -\sum_{x,y}p(x,y)\log\frac{p(x,y)}{p(x)}\\
+			&=& -\sum_{x,y} p(x,y)\log p(y|x) = H(Y|X)
+		\end{eqnarray*}
+
+	\end{frame}
+	
+	\begin{frame}
+		\frametitle{Whis is entropy(5)}
+		Another useful measure of entropy that works equally well in the discrete and the continuous case is the \textbf{Relative Entropy} of a distribution. It is also called as the \textbf{Kullback-Leibler Divergence}.
+		$$D(p||q) = \sum_x p(x)\log \frac{p(x)}{q(x)} = E_{p(x)}\log\frac{p(x)}{q(x)}$$
+		To some extent, Relative Entropy can be the measure of the distance between two random variables.
+		
+		\textbf{Mutual Information} can be defined as:
+		$$I(X,Y)=\sum_{x,y}\log\frac{p(x,y)}{p(x)p(y)}$$
+	\end{frame}
+	
+	\begin{frame}[shrink]
+		\frametitle{What is entropy(6)}
+		Let's consider
+		\begin{eqnarray*}
+			&& H(Y)-I(X,Y)  \\
+			&=& -\sum_y p(y)\log p(y) - \sum_{x,y}\log\frac{p(x,y)}{p(x)p(y)} \\
+			&=& -\sum_y\left(\sum_x p(x,y)\right)\log p(y) - \sum_{x,y}p(x,y)\log\frac{p(x,y)}{p(x)p(y)} \\
+			&=& -\sum_{x,y}p(x,y)\log p(y) - \sum_{x,y}\log\frac{p(x,y)}{p(x)p(y)} \\
+			&=& -\sum_{x,y}p(x,y)\log\frac{p(x,y)}{p(x)} \\
+			&=& -\sum_{x,y}p(x,y)\log p(y|x) = H(Y|X)
+		\end{eqnarray*}
+		According the formula (7):
+		$$I(X,Y) = H(X)+H(Y)-H(X,Y)$$
+	\end{frame}
+\end{document}
+
