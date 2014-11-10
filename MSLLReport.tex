@@ -1,6 +1,8 @@
 \documentclass[slidestop,compress,mathserif]{beamer}
 \usepackage{setspace}
 \usepackage{ragged2e}
+\usepackage{biblatex}
+\bibliography{Domingos}
 \let\raggedright=\RaggedRight
 %\usepackage[bars]{beamerthemetree} % Beamer theme v 2.2
 \usetheme{Antibes} % Beamer theme v 3.0
@@ -1388,7 +1390,56 @@
 	
 	\begin{frame}
 		\frametitle{Maximum Entropy Models(2)}
+		Here, we use binary feature function for feature selection.
+		$$f(x,y)=\left\{
+		\begin{array}{ll}
+		1  &\mbox{if $x,y$ satisfy some condition}\\
+		0  &\mbox{otherwise}
+		\end{array}
+		\right.
+		$$
+		In statistics, the empirical distribution is the cumulative distribution associated with the empirical measure of the sample.
 		
+		Let $\hat{p}(x,y)$ and $\hat{p}(x)$ to be defined as:
+		$$\hat{p}(x,y) = \frac{count(x,y)}{N},\hat{p}(x) = \frac{count(x)}{N}$$
+	\end{frame}
+	\section{Distance and Divergence}
+	\begin{frame}
+		\frametitle{Distance}
+		\textbf{Distance} satisfies four constraints which \text{Divergence} may no satisfy.
+		\begin{itemize}
+			\item \textbf{Non-negativity:} $\forall x,y,\quad d(x,y) \ge 0$
+			\item \textbf{Non-degeneracy:} $d(x,y)=0 \Leftrightarrow x=y$
+			\item \textbf{Symmetry:} $\forall x,y, \quad d(x,y)=d(y,x)$
+			\item \textbf{Triangularity:} $\forall x,y,z \quad d(x,z)\leq d(x,y)+d(y,z)$
+		\end{itemize}
+		\begin{figure}
+			\pgfimage[width=4cm]{"image/29.png"}
+		\end{figure}	
+	\end{frame}
+	
+	\begin{frame}
+		\frametitle{Distance(2)}
+		In the \textbf{Euclidean space} $\mathbb{R}^n$ ,the distance between two point can be given by \textbf{Minkowski distance}.(When p=2, it is equivalent the \textbf{Euclidean distance} and when p=1, it is equivalent to \textbf{Manhattan distance} ) Other distance, based on norms, are sometimes used instead.
+		\begin{itemize}
+			\item 1-norm distance  $= \sum_{i=1}^{n}|x_i-y_i|$
+			\item 2-norm distance  $= \left(\sum_{i=1}^{n}|x_i-y_i|^2\right)^{1/2}$
+			\item p-norm distance  $=  \left(\sum_{i=1}^{n}|x_i-y_i|^p\right)^{1/p}$
+			\item $\infty$ norm distance $=\lim\limits_{p\rightarrow\infty}\left(\sum_{i=1}^{n}|x_i-y_i|^p\right)^{1/p}$
+		\end{itemize}
+		If we care about the direction of the data rather than the magnitude, then using the \textbf{cosine distance} is a common approach. 
+		$$\cos \theta = \frac{A\cdot B}{\|A\|\|B\|}$$
+	\end{frame}
+	
+	\begin{frame}
+		\frametitle{Distance(3)}
+		\textbf{Why is Euclidean distance not a good metric in high dimensions?}
+		\begin{itemize}
+			\item 
+		\end{itemize}
+		Here is text
+		\fullcite{Domingos}
+
 	\end{frame}
 \end{document}
 
