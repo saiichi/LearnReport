@@ -2,6 +2,8 @@
 \usepackage{setspace}
 \usepackage{ragged2e}
 \usepackage{biblatex}
+\usepackage{algorithm}           
+\usepackage{algorithmic}
 \bibliography{Domingos}
 \let\raggedright=\RaggedRight
 %\usepackage[bars]{beamerthemetree} % Beamer theme v 2.2
@@ -1380,17 +1382,38 @@
 		$$I(X,Y) = H(X)+H(Y)-H(X,Y)$$
 	\end{frame}
 	
-	\begin{frame}
-		\frametitle{Maximum Entropy Models}
-		\textbf{The principle of maximum entropy states} that, subject to precisely stated prior data, the model which best represents the current state of knowledge is one with largest entropy.
-		Given a sample collection, $$\mathcal{T}=\{(x_1,y_1),(x_2,y_2),\ldots,(x_N,y_N)\}$$
-		Where $\mathcal{X}=\{x_1,\ldots,x_N\}$ is input set, $\mathcal{Y}=\{y_1,\ldots,y_N\}$ is output set. Our goal is to chose a best classifier which can output $y$ according to probability distribution $p(y|x)$.
+	\begin{frame}[shrink]
+		\frametitle{Motivating example}
+		Suppose we want a model translate English word \textit{in} to French.
+		
+		Let $p$ denote the model, and $p(f)$ denote the probability that $f$ is chose as a translation of \textit{in}.($f \in \{\mbox{dans,en,\`{a},au cours de,pendant}\}$)
+		
+		Now, we can impose our first constraint on our model $p$:
+		$$p(\mbox{dans})+p(\mbox{en})+p(\mbox{\`a})+p(\mbox{au cours de})+p(\mbox{pendant}) = 1$$
+		With no empirical justification, the most in intuitively model is
+		$$p(\mbox{dans})=p(\mbox{en})=p(\mbox{\`a})=p(\mbox{au cours de})=p(\mbox{pendant})=\frac{1}{5}$$
+		If we add an additional constraint
+		$$p(\mbox{dans})+p(\mbox{en}) = \frac{1}{3}$$
+		subject to the constraints
+		$$p(\mbox{dans})=p(\mbox{en})=\frac{3}{20};p(\mbox{\`a})=p(\mbox{au cours de})=p(\mbox{pendant})=\frac{7}{30} $$
 		
 	\end{frame}
 	
 	\begin{frame}
-		\frametitle{Maximum Entropy Models(2)}
-		Here, we use binary feature function for feature selection.
+		\frametitle{Training data}
+		Let's do some form formalization, suppose we have collected a large number of samples $\{(x_1,y_1),(x_2,y_2),\ldots,(x_N,y_N)\}$.
+		\newline
+		\newline
+		In the example we have been considering, each sample would consist of a phrase $x$ containing the words surrounding \textit{in}, together with the translation $y$ of \textit{in}.
+		\newline
+		\newline
+		We can summarize the training example in terms of its \textbf{empirical probability distribution} $\widetilde{p}$,define by
+		$$\widetilde{p}(x,y) = \frac{1}{N} \times \mbox{number of times that $(x,y)$ occurs in sample}$$
+	\end{frame}
+	
+	\begin{frame}
+		\frametitle{Features and constraints}
+		First, let's consider the definition of \textbf{feature function}
 		$$f(x,y)=\left\{
 		\begin{array}{ll}
 		1  &\mbox{if $x,y$ satisfy some condition}\\
@@ -1398,11 +1421,249 @@
 		\end{array}
 		\right.
 		$$
-		In statistics, the empirical distribution is the cumulative distribution associated with the empirical measure of the sample.
+		In our example we have employed some constraints, but we could also consider statistics which depend on $x$.
 		
-		Let $\hat{p}(x,y)$ and $\hat{p}(x)$ to be defined as:
-		$$\hat{p}(x,y) = \frac{count(x,y)}{N},\hat{p}(x) = \frac{count(x)}{N}$$
+		For instance, we might notice that, in the training example, if \textit{April} is the word following \textit{in}, then the translation of in is en with frequency $\frac{9}{10}$.
+		
+		Now we can use feature function to express the event that \textit{in} translates as \textit{en} when \textit{April} is the following word.
+		$$f(x,y)=\left\{
+		\begin{array}{ll}
+		1  &\mbox{if $y=en$ and \textit{April} follows \textit{in}}\\
+		0  &\mbox{otherwise}
+		\end{array}
+		\right.
+		$$
 	\end{frame}
+	
+	\begin{frame}
+		\frametitle{Features and constraints(2)}
+		The expected value of $f$ with respect to the empirical distribution $\widetilde{p}(x,y)$
+		\begin{equation}
+			\widetilde{p}(f) = \sum_{x,y}\widetilde{p}(x,y)f(x,y)
+		\end{equation}
+		The expected value of $f$ with respect to real distribution $p(x,y)$
+		\begin{equation*}
+			p(f) = \sum_{x,y}p(x,y)f(x,y) = \sum_{x,y}p(x)p(y|x)f(x,y)
+		\end{equation*}
+		For convenience, we usually use $\widetilde{p}(x)$ instead of $p(x)$
+		\begin{equation}
+		p(f) = \sum_{x,y}\widetilde{p}(x)p(y|x)f(x,y)
+		\end{equation}
+	\end{frame}
+	
+	\begin{frame}
+		\frametitle{Features and constraints(3)}
+		We constrain this expected value to be the same as the expected value of f in the training sample. That is, we require
+		\begin{equation}
+			p(f) = \widetilde{p}(f). 
+		\end{equation}
+		Combining (8), (9) and (10), we obtain
+		\begin{equation}
+			\sum_{x,y}\widetilde{p}(x)p(y|x)f(x,y) = \sum_{x,y}\widetilde{p}(x,y)f(x,y).
+		\end{equation}
+		We call the requirement (11) a \textbf{constraint equation} or simply a \textbf{constraint}.
+	\end{frame}
+	
+	\begin{frame}
+		\frametitle{The Maximum Entropy Principle}
+		Suppose that we are given $n$ feature function $\{f_1,\ldots,f_n\}$, which determine statistics we feel are import in modeling the process.
+		
+		We would like our model to accord with these conditions. That is, we would like $p$ to lie in the subset $\mathcal{C}$ of $\mathcal{P}$ defined by
+		\begin{equation}
+			\mathcal{C} = \left\{ p\in\mathcal{P} | p(f_i) = \widetilde{p}(f_i) \quad i\in \{1,2,\ldots,n\} \right\}
+		\end{equation}
+		\begin{figure}
+			\pgfimage[width=6cm ]{"image/31.png"}
+		\end{figure}
+	\end{frame}
+	
+	\begin{frame}
+		\frametitle{The Maximum Entropy Principle(2)}
+		Among the models $p\in \mathcal{C}$, the maximum entropy philosophy dictates that we select the distribution which is most uniform, which means we choose $p$ maximizing the entropy
+		\begin{equation}
+			H(p) = -\sum_{x,y}\widetilde{p}(x,y)p(y|x)\log p(y|x)
+		\end{equation}
+		With these definition in hand, we can present the principle of maximum entropy
+		\begin{equation}
+			p^* = \mathrm{arg}\max_{p\in \mathcal{C}} H(p)
+		\end{equation} 
+		It can be shown that $p^*$ is well defined; that is, there is always a unique model $p^*$ with maximum entropy in any constrained set $\mathcal{C}$ 
+	\end{frame}
+
+	\begin{frame}
+		\frametitle{Optimization problem}
+		The constrained optimization problem at hand is to find
+		\begin{equation}
+			p^* = \mathrm{arg}\max_{p\in\mathcal{C}}\left(-\sum_{x,y}\widetilde{p}(x)p(y|x)\log p(y|x) \right)
+		\end{equation}
+		subject to
+		\begin{eqnarray}
+			&& p(y|x) \geq 0 \quad \mbox{for all $x,y$}\\
+			&& \sum_y p(y|x) = 1 \quad \mbox{for all $x$}\\
+			&& \widetilde{p}(f_i) = p(f_i) \quad \mbox{for $i\in \{1,2,\ldots,n\}$}
+		\end{eqnarray}
+	\end{frame}
+	
+	\begin{frame}
+		\frametitle{Optimization problem(2)}
+		To solve this optimization problem, introduce the Lagrangian
+		\begin{equation}
+			\mathcal{L}(p,\Lambda) = -H(p) + \lambda_0\left(1-\sum_y p(y|x) \right) + \sum_{i=1}^{n}\lambda_i\left(\widetilde{p}(f_i)-p(f_i)\right),
+		\end{equation}
+		where $\Lambda = \{\lambda_0,\lambda_1,\ldots,\lambda_n\}$.
+		
+		Then we obtain the \textbf{primary problem}
+		\begin{equation}
+			\min_{p\in\mathcal{C}}\max_{\Lambda}\mathcal{L}(p,\Lambda)
+		\end{equation}
+		For $-H(p)$ is convex function, the primary problem is equivalent to
+		its \textbf{dual problem}
+		\begin{equation}
+			\max_{\Lambda}\min_{p\in\mathcal{C}}\mathcal{L}(p,\Lambda)
+		\end{equation}
+	\end{frame}
+	
+	\begin{frame}
+		\frametitle{Exponential form}
+		Consider the minimum problem in dual problem:
+		\begin{equation}
+			\Psi(\Lambda) = \min_{p\in\mathcal{C}}\mathcal{L}(p,\Lambda) = \mathcal{L}(p_\Lambda,\Lambda),
+		\end{equation}
+		where
+		\begin{equation}
+			p_\Lambda = \mathrm{arg}\max_{p\in\mathcal{C}}\Lambda(p,\Lambda).
+		\end{equation}
+		
+		
+	\end{frame}
+		
+	\begin{frame}
+		\frametitle{Exponential form(2)}
+		The we use \textbf{Lagrangian multiplier method} to obtain $p_\Lambda$
+		\begin{eqnarray*}
+			&&\frac{\partial\mathcal{L}(p,\Lambda)}{\partial p(y|x)} \\
+			&=& \sum_{x,y}\widetilde{p}(x)(\log p(y|x) +1) - \sum_y\lambda_0 - \sum_{i=1}^{n}\left(\sum_{x,y}\widetilde{p}(x)f_i(x,y)\right)\\
+			&=& \sum_{x,y}\widetilde{p}(x)(\log p(y|x) +1) - \sum_x\widetilde{p}(x)\sum_y\lambda_0 - \sum_{x,y}\widetilde{p}(x)\sum_{i=1}^{n}\lambda_i f_i(x,y)\\
+			&=& \sum_{x,y}\widetilde{p}(x)(\log p(y|x) +1) - \sum_{x,y}\widetilde{p}(x)\lambda_0 - \sum_{x,y}\widetilde{p}(x)\sum_{i=1}^{n}\lambda_i f_i(x,y)\\
+			&=& \sum_{x,y}\left(\log p(y|x) +1 -\lambda_0 -\sum_{i=1}^{n}\lambda_i f_i(x,y) \right)
+		\end{eqnarray*}
+	\end{frame}
+	
+	\begin{frame}
+		\frametitle{Exponential form(3)}
+		Let $\frac{\partial\mathcal{L}(p,\Lambda)}{\partial p(y|x)}$ be zero, we obtain
+		\begin{equation}
+			\log p(y|x) +1 -\lambda_0 -\sum_{i=1}^{n}\lambda_i f_i(x,y) = 0,
+		\end{equation}
+		then
+		\begin{equation}
+			p(y|x) = e^{\lambda_0-1}\cdot e^{\sum_{i=1}^{n}\lambda_i f_i(x,y)}.
+		\end{equation}
+		According to constraint (17), we obtain
+		\begin{equation}
+			p_\Lambda = \frac{1}{Z_\Lambda(x)}e^{\sum_{i=1}^{n}\lambda_i f_i(x,y)}
+		\end{equation}
+		where
+		\begin{equation}
+			Z_\Lambda(x) = \sum_y e^{\sum_{i=1}^{n}\lambda_i f_i(x,y)}
+		\end{equation}
+	\end{frame}
+	
+	\begin{frame}[shrink]
+		\frametitle{Maximum likelihood}
+		Consider the maximum problem in dual problem:
+		\begin{equation}
+			\max_\Lambda \Psi(\Lambda)
+		\end{equation}
+		We suppose
+		\begin{equation}
+			\Lambda^* = \mathrm{arg}\max_\Lambda \Psi(\Lambda),
+		\end{equation}
+		then we can solve the optimization problem by $p^* = p_\Lambda$.
+		
+		We know
+		\begin{eqnarray*}
+			\Psi(\Lambda) &=& \mathcal{L}(p_\Lambda,\Lambda)\\
+			&=&\sum_{x,y}\widetilde{p}(x)p_\Lambda(y|x)\log p_\Lambda(y|x) \\
+			&+& \sum_{i=1}^{n}\lambda_i\left(\widetilde{p}(f_i) - \sum_{x,y}\widetilde{p}(x)p_\Lambda(y|x)f_i(x,y)\right)\\
+			&=& \sum_{i=1}^{n} \lambda_i\widetilde{p}(f_i) +\sum_{x,y}\widetilde{p}(x)p_\Lambda(y|x)\left(\log p_\Lambda(y|x) - \sum_{i=1}^{n}\lambda_if_i(x,y)\right)
+		\end{eqnarray*}
+	\end{frame}
+	
+	\begin{frame}
+		\frametitle{Maximum likelihood (2)}
+		According to (26), we obtain
+		\begin{equation}
+			\log p_\Lambda(y|x) = \sum_{i=1}^{n}\lambda_i f_i(x,y) - \log Z_\Lambda(x)
+		\end{equation}
+		substitute it to $\Psi(\Lambda)$,
+		\begin{eqnarray*}
+			\Psi(\Lambda) &=& \sum_{i=1}^{n}\lambda_i\widetilde{p}(f_i)-\sum_{x,y}\widetilde{p}(x)p_\Lambda(y|x)\log Z_\Lambda(x) \\
+			&=& \sum_{i=1}^{n}\lambda_i\widetilde{p}(f_i) - \sum_x \widetilde{p}(x)\log Z_\Lambda(x)\sum_y p_\Lambda(y|x)\\
+			&=& \sum_{i=1}^{n}\lambda_i\widetilde{p}(f_i) - \sum_x\widetilde{p}(x)\log Z_\Lambda(x)
+		\end{eqnarray*}
+	\end{frame}
+	
+	\begin{frame}[shrink]
+		\frametitle{Maximum likelihood (3)}
+		Consider MLE:
+		\begin{equation}
+			\mathcal{L}_{\widetilde{p}}(p) = \log \prod_{x,y} p(y|x)^{\widetilde{p}(x,y)} = \sum_{x,y}\widetilde{p}(x,y)\log p(y|x)
+		\end{equation}
+		According (30) we obtain,
+		\begin{eqnarray*}
+			\mathcal{L}_{\widetilde{p}}(p_\Lambda) &=& \sum_{x,y}\widetilde{p}(x,y)\left(\sum_{i=1}^{n} \lambda_if_i(x,y) - \log Z_\Lambda(x) \right)\\
+			&=& \sum_{x,y}\widetilde{p}(x,y)\sum_{i=1}^{n}\lambda_if_i(x,y)-\sum_{x,y}\widetilde{p}(x,y)\log Z_\Lambda(x) \\
+			&=& \sum_{i=1}^{n}\lambda_i\left(\sum_{x,y}\widetilde{p}(x,y)f_i(x,y)\right) - \sum_{x,y}\widetilde{p}(x,y)\log Z_\Lambda(x)\\
+			&=& \sum_{i=1}^{n}\lambda_i\widetilde{p}(f_i) - \sum_x\widetilde{p}(x)\log Z_\Lambda(x)
+		\end{eqnarray*}
+	\end{frame}
+	
+	\begin{frame}
+		\frametitle{Computing the Parameters}
+		Some Parameters Optimization method in common use like\textbf{ Gradient descent}:
+		\begin{eqnarray*}
+			\frac{\partial\Psi}{\partial\lambda_i} &=& \frac{\partial}{\partial\lambda_i}\left(\sum_{i=1}^{n}\lambda_i\widetilde{p}(f_i) - \sum_x\widetilde{p}(x)\log Z_{\Lambda}(x) \right)\\
+			&=& \widetilde{p}(f_i) - \sum_x\widetilde{p}(x)\frac{1}{Z_{\Lambda}(x)}\frac{\partial}{\partial\lambda_i}\left(\sum_y e^{\sum_{i=1}^{n}\lambda_if_i(x,y)} \right)\\
+			&=& \widetilde{p}(f_i) - \sum_x\widetilde{p}(x)\frac{1}{Z_{\Lambda}(x)}\sum_y e^{\sum_{i=1}^{n}\lambda_if_i(x,y)}f_i(x,y)\\
+			&=& \widetilde{p}(x) - \sum_x \widetilde{p}(x)\sum_y p_{\Lambda}(y|x)f_i(x,y)
+		\end{eqnarray*}
+	\end{frame}
+	
+	\begin{frame}
+		\frametitle{GIS algorithm}
+		\begin{itemize}
+			\item[Step1] Initial parameters. set $\Lambda = 0$
+			\item[Step2] Calculate $E_{\widetilde{p}(f_i)} = \sum_{i=1}^{n}\widetilde{p}(x,y)f_i(x,y)$, for $i=1,2,\ldots,n.$
+			\item[Step3] Iteration, update parameters:
+			\begin{itemize}
+				\item[] Calculate $E_{p_{\Lambda}}(f_i)$, $i=1,2,\ldots,n$.
+				\item[] \textbf{FOR} $i=1,2,\ldots,n$ \textbf{DO}
+				\item[] \{
+				\item[] $\lambda_i := \lambda_i + \eta\log\frac{E_{\widetilde{p}}(f_i)}{E_{p_{\Lambda}}(f_i)}$
+				\item[] \}
+			\end{itemize}
+			\item[Step4] Check convergence.
+		\end{itemize} 	
+	\end{frame}
+	
+	\begin{frame}
+		\frametitle{IIS algorithm}
+		\begin{itemize}
+			\item[Step1] Initial parameters, set $\Lambda := 0$
+			\item[Step2] Iteration, update parameters:
+			\begin{itemize}
+				\item[] \textbf{FOR} $i=1,2,\ldots,n$ \textbf{DO}
+				\item[] \{
+				\item[] 	Solve equations
+				\item[]    $\sum_{x,y}\widetilde{p}(x)p(y|x)f_i(x,y)e^{\delta_i\sum_{i=1}^{n}f_i(x,y)} = \widetilde{p}(f_i)$
+				\item[] Let $\lambda_i := \lambda_i + \delta_i$
+				\item[] \}
+			\end{itemize}
+			\item[Step3] Check convergence.
+		\end{itemize}
+	\end{frame}
+	
 	\section{Distance and Divergence}
 	\begin{frame}
 		\frametitle{Distance}
@@ -1415,9 +1676,10 @@
 		\end{itemize}
 		\begin{figure}
 			\pgfimage[width=4cm]{"image/29.png"}
-		\end{figure}	
+		\end{figure}
+			
 	\end{frame}
-	
+		
 	\begin{frame}
 		\frametitle{Distance(2)}
 		In the \textbf{Euclidean space} $\mathbb{R}^n$ ,the distance between two point can be given by \textbf{Minkowski distance}.(When p=2, it is equivalent the \textbf{Euclidean distance} and when p=1, it is equivalent to \textbf{Manhattan distance} ) Other distance, based on norms, are sometimes used instead.
@@ -1433,13 +1695,19 @@
 	
 	\begin{frame}
 		\frametitle{Distance(3)}
-		\textbf{Why is Euclidean distance not a good metric in high dimensions?}
+		\textbf{Why is Euclidean distance not a good metric in most situation?}
 		\begin{itemize}
-			\item 
+			\item Vector length often is not determinant.
+			\item Most Problems are in high-dimensional.
+			\item Most of the volume of a high-dimensional orange is in the skin, not the pulp.
 		\end{itemize}
-		Here is text
-		\fullcite{Domingos}
-
+		\begin{figure}
+			\pgfimage[width=3cm ]{"image/30.png"}
+		\end{figure}
+	\end{frame}
+	
+	\begin{frame}
+		\frametitle{Divergence}
 	\end{frame}
 \end{document}
 
