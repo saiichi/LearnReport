@@ -4,6 +4,7 @@
 \usepackage{biblatex}
 \usepackage{algorithm}           
 \usepackage{algorithmic}
+\usepackage{wasysym}
 \bibliography{Domingos}
 \let\raggedright=\RaggedRight
 %\usepackage[bars]{beamerthemetree} % Beamer theme v 2.2
@@ -17,6 +18,7 @@
 % coverpage
 \begin{frame} % Cover slide
 \titlepage
+You can get this ppt from https://github.com/saiichi/LearnReport
 \end{frame}
 %section 1 Supervised Learning
 \section{Supervised Learning}
@@ -1310,11 +1312,12 @@
 
 	\end{frame}
 	\section{Maximum Entropy Models}
+	\subsection{Basic Knowledge}
 	\begin{frame}
 		\frametitle{What is entropy}
 		In thermodynamics, entropy (usual symbol $S$) is a measure of the number of specific ways in which a thermodynamic system may be arranged, commonly understood as a measure of disorder.
-		$$\Delta = \int\frac{dQ_{rev}}{T}$$
-		In information theory, \textbf{Entropy} is a measure of unpredictability of information content. Shannon defined the entropy $H$ of a discrete random variable $X$ with possible values $x1, ..., xn$ and probability mass function P(X) as:
+		$$\Delta S = \int\frac{dQ_{rev}}{T}$$
+		In information theory, \textbf{Entropy} is a measure of unpredictability of information content. Shannon defined the entropy $H$ of a discrete random variable $X$ with possible values $x_1, ..., x_n$ and probability mass function P(X) as:
 		$$H(X) = E[I(X)] = E[-\ln(P(X))]$$
 		Here $I$ is the information content of X.
 		
@@ -1374,7 +1377,7 @@
 			&& H(Y)-I(X,Y)  \\
 			&=& -\sum_y p(y)\log p(y) - \sum_{x,y}\log\frac{p(x,y)}{p(x)p(y)} \\
 			&=& -\sum_y\left(\sum_x p(x,y)\right)\log p(y) - \sum_{x,y}p(x,y)\log\frac{p(x,y)}{p(x)p(y)} \\
-			&=& -\sum_{x,y}p(x,y)\log p(y) - \sum_{x,y}\log\frac{p(x,y)}{p(x)p(y)} \\
+			&=& -\sum_{x,y}p(x,y)\log p(y) - \sum_{x,y}p(x,y)\log\frac{p(x,y)}{p(x)p(y)} \\
 			&=& -\sum_{x,y}p(x,y)\log\frac{p(x,y)}{p(x)} \\
 			&=& -\sum_{x,y}p(x,y)\log p(y|x) = H(Y|X)
 		\end{eqnarray*}
@@ -1382,6 +1385,7 @@
 		$$I(X,Y) = H(X)+H(Y)-H(X,Y)$$
 	\end{frame}
 	
+	\subsection{Modeling}
 	\begin{frame}[shrink]
 		\frametitle{Motivating example}
 		Suppose we want a model translate English word \textit{in} to French.
@@ -1407,13 +1411,13 @@
 		In the example we have been considering, each sample would consist of a phrase $x$ containing the words surrounding \textit{in}, together with the translation $y$ of \textit{in}.
 		\newline
 		\newline
-		We can summarize the training example in terms of its \textbf{empirical probability distribution} $\widetilde{p}$,define by
-		$$\widetilde{p}(x,y) = \frac{1}{N} \times \mbox{number of times that $(x,y)$ occurs in sample}$$
+		We can summarize the training example in terms of its \textbf{empirical probability distribution} $\widetilde{p}$, define by
+		$$\widetilde{p}(x,y) = \frac{1}{N} \times \mbox{number of times that $(x,y)$ occurs in sample}.$$
 	\end{frame}
 	
 	\begin{frame}
 		\frametitle{Features and constraints}
-		First, let's consider the definition of \textbf{feature function}
+		Now, let's consider the definition of \textbf{feature function}
 		$$f(x,y)=\left\{
 		\begin{array}{ll}
 		1  &\mbox{if $x,y$ satisfy some condition}\\
@@ -1423,7 +1427,7 @@
 		$$
 		In our example we have employed some constraints, but we could also consider statistics which depend on $x$.
 		
-		For instance, we might notice that, in the training example, if \textit{April} is the word following \textit{in}, then the translation of in is en with frequency $\frac{9}{10}$.
+		For instance, we might notice that, in the training example, if \textit{April} is the word following \textit{in}, then the translation of \textit{in} is \textit{en}.
 		
 		Now we can use feature function to express the event that \textit{in} translates as \textit{en} when \textit{April} is the following word.
 		$$f(x,y)=\left\{
@@ -1481,7 +1485,7 @@
 		\frametitle{The Maximum Entropy Principle(2)}
 		Among the models $p\in \mathcal{C}$, the maximum entropy philosophy dictates that we select the distribution which is most uniform, which means we choose $p$ maximizing the entropy
 		\begin{equation}
-			H(p) = -\sum_{x,y}\widetilde{p}(x,y)p(y|x)\log p(y|x)
+			H(p) = -\sum_{x,y}p(x,y)p(y|x)\log p(y|x)
 		\end{equation}
 		With these definition in hand, we can present the principle of maximum entropy
 		\begin{equation}
@@ -1524,53 +1528,47 @@
 	\end{frame}
 	
 	\begin{frame}
-		\frametitle{Exponential form}
+		\frametitle{Optimization problem(3)}
 		Consider the minimum problem in dual problem:
 		\begin{equation}
 			\Psi(\Lambda) = \min_{p\in\mathcal{C}}\mathcal{L}(p,\Lambda) = \mathcal{L}(p_\Lambda,\Lambda),
 		\end{equation}
 		where
 		\begin{equation}
-			p_\Lambda = \mathrm{arg}\max_{p\in\mathcal{C}}\Lambda(p,\Lambda).
+			p_\Lambda = \mathrm{arg}\max_{p\in\mathcal{C}}\mathcal{L}(p,\Lambda).
+		\end{equation}
+		The we use \textbf{Lagrangian multiplier method} to obtain $p_\Lambda$
+		\begin{equation}
+		\frac{\partial\mathcal{L}(p,\Lambda)}{\partial p(y|x)} 
+		=\widetilde{p}(x)(\log p(y|x) +1) - \lambda_0 - \sum_{i=1}^{n}\widetilde{p}(x)f_i(x,y)
 		\end{equation}
 		
-		
 	\end{frame}
 		
-	\begin{frame}
-		\frametitle{Exponential form(2)}
-		The we use \textbf{Lagrangian multiplier method} to obtain $p_\Lambda$
-		\begin{eqnarray*}
-			&&\frac{\partial\mathcal{L}(p,\Lambda)}{\partial p(y|x)} \\
-			&=& \sum_{x,y}\widetilde{p}(x)(\log p(y|x) +1) - \sum_y\lambda_0 - \sum_{i=1}^{n}\left(\sum_{x,y}\widetilde{p}(x)f_i(x,y)\right)\\
-			&=& \sum_{x,y}\widetilde{p}(x)(\log p(y|x) +1) - \sum_x\widetilde{p}(x)\sum_y\lambda_0 - \sum_{x,y}\widetilde{p}(x)\sum_{i=1}^{n}\lambda_i f_i(x,y)\\
-			&=& \sum_{x,y}\widetilde{p}(x)(\log p(y|x) +1) - \sum_{x,y}\widetilde{p}(x)\lambda_0 - \sum_{x,y}\widetilde{p}(x)\sum_{i=1}^{n}\lambda_i f_i(x,y)\\
-			&=& \sum_{x,y}\left(\log p(y|x) +1 -\lambda_0 -\sum_{i=1}^{n}\lambda_i f_i(x,y) \right)
-		\end{eqnarray*}
-	\end{frame}
-	
-	\begin{frame}
-		\frametitle{Exponential form(3)}
+	\begin{frame}[shrink]
+		\frametitle{Optimization problem(4)}
+		
 		Let $\frac{\partial\mathcal{L}(p,\Lambda)}{\partial p(y|x)}$ be zero, we obtain
 		\begin{equation}
-			\log p(y|x) +1 -\lambda_0 -\sum_{i=1}^{n}\lambda_i f_i(x,y) = 0,
+		\log p(y|x) +1 -\lambda_0 -\sum_{i=1}^{n}\lambda_i f_i(x,y) = 0,
 		\end{equation}
 		then
 		\begin{equation}
-			p(y|x) = e^{\lambda_0-1}\cdot e^{\sum_{i=1}^{n}\lambda_i f_i(x,y)}.
+		p(y|x) = e^{\lambda_0-1}\cdot e^{\sum_{i=1}^{n}\lambda_i f_i(x,y)}.
 		\end{equation}
 		According to constraint (17), we obtain
 		\begin{equation}
-			p_\Lambda = \frac{1}{Z_\Lambda(x)}e^{\sum_{i=1}^{n}\lambda_i f_i(x,y)}
+		p_\Lambda = \frac{1}{Z_\Lambda(x)}e^{\sum_{i=1}^{n}\lambda_i f_i(x,y)}
 		\end{equation}
 		where
 		\begin{equation}
-			Z_\Lambda(x) = \sum_y e^{\sum_{i=1}^{n}\lambda_i f_i(x,y)}
+		Z_\Lambda(x) = \sum_y e^{\sum_{i=1}^{n}\lambda_i f_i(x,y)}
 		\end{equation}
 	\end{frame}
 	
+	
 	\begin{frame}[shrink]
-		\frametitle{Maximum likelihood}
+		\frametitle{Optimization problem(5)}
 		Consider the maximum problem in dual problem:
 		\begin{equation}
 			\max_\Lambda \Psi(\Lambda)
@@ -1591,7 +1589,7 @@
 	\end{frame}
 	
 	\begin{frame}
-		\frametitle{Maximum likelihood (2)}
+		\frametitle{Optimization problem(6)}
 		According to (26), we obtain
 		\begin{equation}
 			\log p_\Lambda(y|x) = \sum_{i=1}^{n}\lambda_i f_i(x,y) - \log Z_\Lambda(x)
@@ -1605,7 +1603,7 @@
 	\end{frame}
 	
 	\begin{frame}[shrink]
-		\frametitle{Maximum likelihood (3)}
+		\frametitle{Maximum likelihood}
 		Consider MLE:
 		\begin{equation}
 			\mathcal{L}_{\widetilde{p}}(p) = \log \prod_{x,y} p(y|x)^{\widetilde{p}(x,y)} = \sum_{x,y}\widetilde{p}(x,y)\log p(y|x)
@@ -1664,10 +1662,11 @@
 		\end{itemize}
 	\end{frame}
 	
-	\section{Distance and Divergence}
+	\section{Similarity measure}
+	\subsection{Distance}
 	\begin{frame}
-		\frametitle{Distance}
-		\textbf{Distance} satisfies four constraints which \text{Divergence} may no satisfy.
+		\frametitle{Euclidean distance and cosine}
+		Strict \textbf{distance} satisfies four constraints while \text{divergence} may no satisfy.
 		\begin{itemize}
 			\item \textbf{Non-negativity:} $\forall x,y,\quad d(x,y) \ge 0$
 			\item \textbf{Non-degeneracy:} $d(x,y)=0 \Leftrightarrow x=y$
@@ -1675,13 +1674,13 @@
 			\item \textbf{Triangularity:} $\forall x,y,z \quad d(x,z)\leq d(x,y)+d(y,z)$
 		\end{itemize}
 		\begin{figure}
-			\pgfimage[width=4cm]{"image/29.png"}
+			\pgfimage[width=3cm]{"image/29.png"}
 		\end{figure}
 			
 	\end{frame}
 		
 	\begin{frame}
-		\frametitle{Distance(2)}
+		\frametitle{Euclidean distance and cosine(2)}
 		In the \textbf{Euclidean space} $\mathbb{R}^n$ ,the distance between two point can be given by \textbf{Minkowski distance}.(When p=2, it is equivalent the \textbf{Euclidean distance} and when p=1, it is equivalent to \textbf{Manhattan distance} ) Other distance, based on norms, are sometimes used instead.
 		\begin{itemize}
 			\item 1-norm distance  $= \sum_{i=1}^{n}|x_i-y_i|$
@@ -1694,20 +1693,80 @@
 	\end{frame}
 	
 	\begin{frame}
-		\frametitle{Distance(3)}
+		\frametitle{Euclidean distance and cosine(3)}
 		\textbf{Why is Euclidean distance not a good metric in most situation?}
 		\begin{itemize}
 			\item Vector length often is not determinant.
 			\item Most Problems are in high-dimensional.
 			\item Most of the volume of a high-dimensional orange is in the skin, not the pulp.
 		\end{itemize}
+	\end{frame}
+	
+	\subsection{Divergence}
+	\begin{frame}
+		\frametitle{Kullback-Leibler Divergence}
+		Kullback-Leibler Divergence defines as
+		\begin{equation}
+			KL(p||p') = \int p(x) \log\frac{p(x)}{p'(x)}dx
+		\end{equation}
+		\begin{itemize}
+			\item[\smiley]  Compatible with maximum likelihood.
+			\item[\smiley]  Invariant under input transformation.
+			\item[\frownie]  Doesn’t satisfy symmetry and triangularity.
+			\item[\frownie]  Sensitive to outliers (due to log and ratio).
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}
+		\frametitle{f-Divergence}
+		Definition:
+		\begin{equation}
+			F(p||p') = \int p'(x)f\left(\frac{p(x)}{p'(x)}\right)dx
+		\end{equation}
+		where $f$ is convex function such as $f(1)=0$
+		
+		Let $f\left(\frac{p(x)}{p'(x)}\right) = \frac{p(x)}{p'(x)}\log \frac{p(x)}{p'(x)}$, then yield the KL-divergence.
+		
+		To avoid the log function, let us use $f = \left(\frac{p(x)}{p'(x)}-1\right)^2$. We obtain the \textbf{Pearson (PE) Divergence}
+		\begin{equation}
+			PE(p||p') = \int p'(x)\left(\frac{p(x)}{p'(x)}-1\right)^2
+		\end{equation}
+	\end{frame}
+	
+	\begin{frame}
+		\frametitle{Relative Density Ratio}
+		Density ratio $\frac{p(x)}{p'(x)}$ can diverge to infinity. However, Relative density ratio is always bounded:
+		
+		\begin{equation}
+			\frac{p(x)}{\beta p(x) + (1-\beta)p'(x)} < \frac{1}{\beta} \quad 0\le\beta<1
+		\end{equation}
 		\begin{figure}
-			\pgfimage[width=3cm ]{"image/30.png"}
+			\pgfimage[width=10cm]{"image/34.png"}
 		\end{figure}
 	\end{frame}
 	
 	\begin{frame}
-		\frametitle{Divergence}
+		\frametitle{Relative Pearson (rPE) Divergence}
+		\begin{equation}
+			rPE(p||p') = PE(p||p_\beta) = \int p_\beta(x)\left(\frac{p(x)}{p_\beta(x)}-1\right)^2dx
+		\end{equation}
+		where
+		$$ 0\le\beta<1 \quad p_\beta(x) = \beta p(x) + (1-\beta)p'(x)  $$
+		\begin{itemize}
+			\item[\smiley]  Compatible with least-squares.
+			\item[\smiley]  Invariant under input transformation.
+			\item[\smiley]  Robust against outliers.
+			\item[\frownie]  Doesn’t satisfy symmetry and triangularity.
+			\item[\frownie]  Not clear how to choose $\beta$.
+		\end{itemize}
 	\end{frame}
+	
+	\begin{frame}
+		\begin{figure}
+			\frametitle{How to choose}
+			\pgfimage[width=10cm]{"image/33.png"}
+		\end{figure}
+	\end{frame}
+	
 \end{document}
 
