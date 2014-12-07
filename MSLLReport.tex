@@ -21,6 +21,227 @@
 You can get this ppt from https://github.com/saiichi/LearnReport
 \end{frame}
 %section 1 Supervised Learning
+\section{Introduction to Machine Learning}
+\begin{frame}
+	\frametitle{Machine Learning: The Original Motivation}
+	Traditional Software Process:
+	\begin{itemize}
+		\item Interview the experts,
+		\item Create an algorithm that automates their process.
+	\end{itemize}
+	Machine Learning process:
+	\begin{itemize}
+		\item Collect input-output examples from the experts.
+		\item Learn a function to map from the input to the output.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Supervised Learning}
+	\begin{itemize}
+		\item Given: Training examples$(x_i,f(x_i))$ for some unknown function $f$.
+		\item Find: A good approximation to $f$.
+		\item Example Applications
+		\begin{itemize}
+			\item Handwriting recognition
+			\begin{itemize}
+				\item $x$ data from pen motion
+				\item $f(x)$ letter of the alphabet
+			\end{itemize}
+			\item Disease Diagnosis
+			\begin{itemize}
+				\item $x$: properties of patient(symptoms, lab tests)
+				\item $f(x)$: disease(or maybe, recommended therapy)
+			\end{itemize}
+			\item Face recognition
+			\begin{itemize}
+				\item $x$: bitmap picture of person's face
+				\item $f(x)$: name of person
+			\end{itemize}
+			\item Spam detection
+			\begin{itemize}
+				\item $x$: email message
+				\item $f(x)$: spam or not spam
+			\end{itemize}
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Formal Setting}
+	\begin{itemize}
+		\item Training examples are drawn independently at random according to unknown probability distribution $P(x,y)$.
+		\item The learning algorithm analyzes the examples and produces a classifier $f$.
+		\item Given a new data point $(x,y)$ drawn from $P$, the classifier is given $x$ and predicts $\hat{y} = f(x)$.
+		\item The loss $\mathcal{L}(\hat{y},y)$ is then measured.
+		\item Goal of the learning algorithm: Find the $f$ that minimizes the expected loss
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Formal Version of Spam Detection}
+	\begin{itemize}
+		\item $P(x,y)$: distribution of email message $x$ and their true labels $y$("spam" or "not spam").
+		\item training sample: a set of email messages that have been labeled by the user.
+		\item learning algorithm: logistic regression and so on.
+		\item $f$: the classifier output by the learning algorithm.
+		\item test point: A new email message $x$.
+		\item loss function $\mathcal{L}(\hat{y},y)$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\begin{itemize}
+		\frametitle{Three main approaches to ML}
+		\item Learn a classifier: a function $f$
+		\item Learn a conditional distribution: a conditional distribution $P(y|x)$
+		\item Learn the joint probability distribution: $P(x,y)$
+		\item One example for each method
+		\begin{itemize}
+			\item A classifier: The Perceptron algorithm.
+			\item A conditional distribution: Logistic regression.
+			\item A joint distribution: Linear discriminant analysis.
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Linear Threshold Units}
+	\begin{equation}
+		h_w(x) = g_w(w^Tx)=\left\{
+		\begin{array}{ll}
+		1  &\mbox{if $w^Tx \ge w_0$}\\
+		-1  &\mbox{otherwise}
+		\end{array}
+		\right.
+	\end{equation}
+	\begin{itemize}
+		\item Where $x = (x_1,\ldots,x_n)$, $w = (w_1,\ldots,w_n)$.We assume that each feature $x_j$ and each weight $w_j$ is a real.
+		\item For convenience, we transform $x = (x_1,\ldots,x_n)$ to $x=(-1,x_1,\ldots,x_n)$, then the parameter vector will then be $w=(w_0,w_1,\ldots,w_n)$
+		\item Our goal is to find $w$
+	\end{itemize}
+	
+	
+\end{frame}
+
+\begin{frame}
+	\frametitle{Geometrical View}
+	\begin{itemize}
+		\item Consider three training examples:\\
+		$(<1.0,1.0>,+1),(<1.5,3.0>,+1),(<2.0,2.0>,-1)$
+		\item We want a classifier that looks like the following:
+		\begin{figure}
+			\pgfimage[height=5cm ]{"image/35.png"}
+		\end{figure}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{ML == Optimization}
+	\begin{itemize}
+		\item Given:\\
+			-A set of $N$ training examples\\
+			\quad $\{x^{(1)},\ldots,x^{(N)}\}$
+		\item Find:\\
+			-The weight vector $w$ that minimizes the expected loss on the training data.
+			\begin{equation}
+				J(w) = \frac{1}{N}\sum_{i=1}^{N}\mathcal{L}(sgn(w^Tx^{(i)}),y_i)
+			\end{equation}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Problem: Step-wise Constant Loss Function}
+	\begin{figure}
+		\pgfimage[height=5cm ]{"image/36.png"}
+	\end{figure}
+	Derivative is either $0$ or $\infty$
+\end{frame}
+
+\begin{frame}
+	\frametitle{Approximating the expected loss by a smooth function}
+	\begin{itemize}
+		\item Simplify the optimization problem by replacing the original objective function by a surrogate loss function. For example, consider the hinge loss:
+		\begin{equation}
+			\widetilde{J}(w) = \frac{1}{N}\sum_{N}^{i=1}\max(0,1-y_iw^Tx^{(i)})
+		\end{equation}
+		\item When $y=1$
+		\begin{figure}
+			\pgfimage[height=3.5cm ]{"image/37.png"}
+		\end{figure}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Gradient of the Hinge Loss}
+	Let $\widetilde{J}_i(w) = \max(0,-y_iw^tx^{(i)})$
+	$$\frac{\partial\widetilde{J}(w)}{\partial w_k} = \frac{\partial}{\partial w_k}\left(\frac{1}{N}\sum_{i=1}^{N}\widetilde{J}_i(w)\right)=\frac{1}{N}\sum_{i=1}^{N}\frac{\partial}{\partial w_k}\tilde{J}_i(w)$$
+	\begin{eqnarray}
+		\sum_{i=1}^{N}\frac{\partial}{\partial w_k}\tilde{J}_i(w) &=& \frac{\partial}{\partial w_k}\max\left(0,-y_i\sum_{j}w_jx_j^{(i)}\right) \\
+		&=& \left\{
+		\begin{array}{ll}
+		0  &\mbox{if $w^Tx \ge w_0$}\\
+		-yx_k^{(i)}  &\mbox{otherwise}
+		\end{array}
+		\right.
+	\end{eqnarray}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Minimizing $\tilde{J}$ by Gradient Descent Search}
+	\begin{figure}
+		\pgfimage[height=3.5cm ]{"image/38.png"}
+	\end{figure}
+	\begin{itemize}
+		\item Start with weight vector $w^{(0)}$
+		\item Compute gradient $\nabla\tilde{J}(w^{(0)}) = \left(\frac{\partial\tilde{J}(w^{(0)})}{\partial w_0},\frac{\partial\tilde{J}(w^{(0)})}{\partial w_1},\ldots,\frac{\partial\tilde{J}(w^{(0)})}{\partial w_2}\right)$
+		\item Compute $w^{(1)} = w^{(0)} - \eta \nabla\tilde{J}(w^{(0)})$
+		\item Repeat until convergence
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Logistic Regression}
+	\begin{itemize}
+		\item Learn the conditional probability $P(y|x)$
+		\item Let $p(y|x;w)$ be our estimate of $P(y|x)$, where $w$ is a vector of adjustable parameters. Assume only two classes $y=0$ and $y=1$, and
+		$$p(y=1|x;w) = \frac{\exp w^Tx}{1+\exp w^Tx}$$
+		$$p(y=0|x;w) = 1-p(y=1|x;w)$$
+		\item It is easy to show that this is equivalent to
+		$$\log\frac{p(y=1|x;w)}{p(y=0|x;w)}=w^Tx$$
+		\item In other words, the log odds of class 1 is a linear function of x
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Why the exp function}
+	One reason: linear function has a range from $-\infty$ to $+\infty$ and we need to force it to be positive and sum to 1 in order to be a probability:
+	\begin{figure}
+		\pgfimage[height=4cm ]{"image/39.png"}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Choosing the Loss Function}
+	For probabilistic models, we use the log loss:
+	$$\mathcal{L}(\hat{P}(y|x),y) =  \left\{
+	\begin{array}{ll}
+	-\log \hat{P}(y=1|x^{(i)})  &\mbox{if $y_i=1$}\\
+	-\log \hat{P}(y+0|x^{(i)})  &\mbox{if $y_i=0$}
+	\end{array}
+	\right.$$ 
+	\begin{figure}
+		\pgfimage[height=5cm ]{"image/40.png"}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Maximum Likelihood Fitting}
+	\begin{itemize}
+		
+	\end{itemize}
+\end{frame}
+
 \section{Supervised Learning}
 %section 1.1 Discriminate Method
     \subsection{Review}
@@ -42,11 +263,12 @@ You can get this ppt from https://github.com/saiichi/LearnReport
 
                 $$h_w(x) = g_w(w^Tx)=\left\{
                     \begin{array}{ll}
-                        1  &\mbox{if $w^Tx \ge 0$}\\
+                        1  &\mbox{if $w^Tx \ge w_0$}\\
                         -1  &\mbox{otherwise}
                     \end{array}
                     \right.
                 $$
+                
         \end{enumerate}
         %\end{block}
 
@@ -1127,7 +1349,7 @@ You can get this ppt from https://github.com/saiichi/LearnReport
 		\end{itemize}
 	\end{frame}
 	\begin{frame}
-		\frametitle{Some concepts}
+		\frametitle{The probability explanation for ML}
 		\begin{itemize}
 			\item The world is reduced to a set of random variables $x_1,\ldots,x_d$
 			\begin{itemize}
